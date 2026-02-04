@@ -1,0 +1,1221 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lusso Auto Studio | Private Mobile Auto Detailing in KWC</title>
+  <meta name="description" content="Luxury-level, appointment-only mobile auto detailing in Kitchener–Waterloo–Cambridge. Membership available by request." />
+  <meta name="theme-color" content="#0b0b0c" />
+
+  <!-- Optional luxury font (safe + fast; site still looks premium without it) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+
+  <!-- Local SEO Schema (update phone/url/social later) -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"LocalBusiness",
+    "name":"Lusso Auto Studio",
+    "description":"Refined, appointment-only mobile auto detailing serving Kitchener–Waterloo–Cambridge (KWC).",
+    "areaServed":[
+      {"@type":"City","name":"Kitchener"},
+      {"@type":"City","name":"Waterloo"},
+      {"@type":"City","name":"Cambridge"}
+    ],
+    "serviceType":[
+      "Mobile Auto Detailing",
+      "Maintenance Wash",
+      "Interior Detailing",
+      "Full Detail",
+      "Pet Hair Removal",
+      "Odour Treatment"
+    ],
+    "telephone":"+1-647-000-0000",
+    "url":"https://lussoautostudio.ca",
+    "priceRange":"$$",
+    "sameAs":["https://instagram.com/lussoautostudio"]
+  }
+  </script>
+
+  <style>
+    :root{
+      --bg:#0b0b0c;
+      --bg2:#111216;
+      --card:rgba(255,255,255,.06);
+      --line:rgba(255,255,255,.08);
+      --line2:rgba(199,167,106,.22);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --muted2:rgba(255,255,255,.55);
+      --gold:#c7a76a;     /* muted brass */
+      --gold2:#b89455;
+      --shadow:0 14px 50px rgba(0,0,0,.55);
+      --shadow2:0 22px 80px rgba(0,0,0,.65);
+      --radius:22px;
+      --max:1120px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-x:hidden;
+    }
+
+    /* Subtle premium background */
+    .bg-glow{
+      position:fixed; inset:0; pointer-events:none; z-index:0;
+      background:
+        radial-gradient(520px circle at 50% 10%, rgba(199,167,106,.12), rgba(11,11,12,0) 60%),
+        radial-gradient(600px circle at 110% 85%, rgba(255,255,255,.06), rgba(11,11,12,0) 60%);
+    }
+
+    /* Cursor glow - desktop only */
+    .cursor-glow{
+      position:fixed; inset:0; pointer-events:none; z-index:1;
+      opacity:0;
+      background: radial-gradient(560px circle at var(--x,50%) var(--y,25%), rgba(199,167,106,.12), rgba(11,11,12,0) 60%);
+      mix-blend-mode:screen;
+      transition:opacity 240ms ease;
+    }
+    @media (hover:hover) and (pointer:fine){
+      .cursor-glow{opacity:1}
+    }
+    @media (prefers-reduced-motion:reduce){
+      html{scroll-behavior:auto}
+      .cursor-glow{transition:none}
+    }
+
+    header{
+      position:sticky; top:0; z-index:50;
+      border-bottom:1px solid rgba(255,255,255,.06);
+      background:rgba(11,11,12,.72);
+      backdrop-filter: blur(10px);
+    }
+
+    .wrap{max-width:var(--max); margin:0 auto; padding:0 16px}
+    .row{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:12px 0}
+
+    .brand{display:flex; align-items:center; gap:12px; text-decoration:none; color:var(--text)}
+    .logo{
+      width:40px; height:40px; border-radius:999px;
+      display:grid; place-items:center;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow:0 0 0 1px var(--line2) inset;
+    }
+    .logo span{
+      font-family:"Cormorant Garamond", serif;
+      font-size:22px; color:var(--gold);
+      line-height:1;
+    }
+    .brand-title{
+      font-family:"Cormorant Garamond", serif;
+      font-size:18px; letter-spacing:.02em;
+      margin:0;
+    }
+    .brand-sub{
+      font-size:11px; letter-spacing:.25em; text-transform:uppercase;
+      color:var(--muted2);
+      margin-top:2px;
+    }
+
+    nav{display:none; gap:6px; align-items:center}
+    nav a{
+      color:var(--muted);
+      text-decoration:none;
+      font-size:13px;
+      padding:10px 10px;
+      border-radius:999px;
+      transition:background .2s ease, color .2s ease;
+    }
+    nav a:hover{background:rgba(255,255,255,.06); color:var(--text)}
+    @media (min-width:780px){ nav{display:flex} }
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      border-radius:999px;
+      padding:11px 16px;
+      text-decoration:none;
+      font-weight:650;
+      letter-spacing:.01em;
+      border:1px solid transparent;
+      transition:transform .15s ease, opacity .15s ease, background .2s ease, border-color .2s ease;
+      will-change:transform;
+    }
+    .btn:active{transform:scale(.99)}
+    .btn-gold{background:var(--gold); color:#0b0b0c}
+    .btn-gold:hover{opacity:.92}
+    .btn-ghost{background:rgba(255,255,255,.06); border-color:rgba(199,167,106,.22); color:var(--text)}
+    .btn-ghost:hover{background:rgba(255,255,255,.10)}
+    .btn-sm{padding:10px 14px; font-size:13px}
+
+    /* Hero */
+    section{position:relative; z-index:2}
+    .hero{padding:36px 0 28px}
+    @media(min-width:780px){ .hero{padding:56px 0 40px} }
+
+    .grid{display:grid; gap:20px;}
+    @media(min-width:980px){ .grid{grid-template-columns: 1.05fr .95fr; gap:28px} }
+
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      border-radius:999px;
+      padding:8px 12px;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow:0 0 0 1px var(--line2) inset;
+      color:var(--muted);
+      font-size:12px;
+    }
+    .dot{width:6px; height:6px; border-radius:99px; background:var(--gold)}
+
+    h1{
+      font-family:"Cormorant Garamond", serif;
+      font-weight:600;
+      letter-spacing:.02em;
+      font-size: clamp(2.05rem, 6vw, 3.6rem);
+      line-height:1.04;
+      margin:16px 0 0;
+    }
+    .lead{
+      margin:14px 0 0;
+      font-size: clamp(1.02rem, 2.2vw, 1.15rem);
+      line-height:1.65;
+      color:var(--muted);
+      max-width: 52ch;
+    }
+    .actions{margin-top:18px; display:flex; flex-direction:column; gap:10px}
+    @media(min-width:520px){ .actions{flex-direction:row} }
+
+    .stats{
+      margin-top:18px;
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap:10px;
+    }
+    @media(min-width:780px){ .stats{grid-template-columns: repeat(4, minmax(0,1fr))} }
+
+    .stat{
+      border-radius:18px;
+      padding:12px;
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow:0 0 0 1px rgba(255,255,255,.06) inset;
+      transition:transform .15s ease, background .2s ease;
+    }
+    .stat:hover{background:rgba(255,255,255,.08)}
+    .stat small{
+      display:block;
+      font-size:11px;
+      letter-spacing:.25em;
+      text-transform:uppercase;
+      color:var(--muted2);
+    }
+    .stat b{
+      display:block;
+      margin-top:6px;
+      font-size:14px;
+      font-weight:650;
+      color:var(--text);
+    }
+
+    .card{
+      border-radius:var(--radius);
+      background:var(--bg2);
+      box-shadow:0 0 0 1px var(--line2) inset, var(--shadow);
+      overflow:hidden;
+    }
+    .card img{
+      width:100%;
+      height:auto;
+      display:block;
+      aspect-ratio: 16 / 10;
+      object-fit:cover;
+      opacity:.92;
+    }
+    .card-body{padding:18px}
+    .kicker{
+      font-size:11px;
+      letter-spacing:.25em;
+      text-transform:uppercase;
+      color:var(--muted2);
+    }
+    .card-title{
+      margin:10px 0 0;
+      font-family:"Cormorant Garamond", serif;
+      font-size:26px;
+      letter-spacing:.01em;
+    }
+    .card-text{margin:10px 0 0; color:var(--muted); line-height:1.6}
+    .card-actions{margin-top:14px; display:flex; flex-direction:column; gap:10px}
+    @media(min-width:520px){ .card-actions{flex-direction:row} }
+
+    .divider{height:1px; background:rgba(255,255,255,.06); margin:18px 0}
+
+    /* Sections */
+    .section{padding:34px 0}
+    @media(min-width:780px){ .section{padding:54px 0} }
+    .section-top{display:flex; flex-direction:column; gap:10px; max-width: 72ch}
+    .eyebrow{
+      font-size:11px;
+      letter-spacing:.30em;
+      text-transform:uppercase;
+      color:var(--muted2);
+    }
+    h2{
+      font-family:"Cormorant Garamond", serif;
+      font-weight:600;
+      letter-spacing:.015em;
+      font-size: clamp(1.65rem, 4.2vw, 2.55rem);
+      line-height:1.12;
+      margin:0;
+    }
+    .subtext{margin:0; color:var(--muted); line-height:1.7}
+
+    .cards3{display:grid; gap:12px; margin-top:18px}
+    @media(min-width:860px){ .cards3{grid-template-columns: repeat(3, minmax(0,1fr)); gap:14px} }
+
+    /* --- Services tiles: match premium "tile" interaction --- */
+    .mini{
+      border-radius:var(--radius);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow:0 0 0 1px rgba(255,255,255,.07) inset;
+      padding:18px;
+      transition:transform .16s ease, background .2s ease, box-shadow .2s ease;
+      position:relative;
+      overflow:hidden;
+      cursor:pointer;
+    }
+    .mini:before{
+      content:"";
+      position:absolute;
+      inset:-1px;
+      background: radial-gradient(650px circle at 80% 20%, rgba(255,255,255,.06), transparent 55%);
+      opacity:0;
+      transition:opacity .2s ease;
+      pointer-events:none;
+    }
+    .mini:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,.08);
+      box-shadow:0 0 0 1px rgba(199,167,106,.18) inset, var(--shadow);
+    }
+    .mini:hover:before{opacity:1}
+    .mini:focus-within{
+      box-shadow:0 0 0 1px rgba(199,167,106,.28) inset, 0 0 0 3px rgba(199,167,106,.15);
+    }
+    .mini h3{
+      margin:0;
+      font-family:"Cormorant Garamond", serif;
+      font-size:22px;
+      color:var(--gold);
+      letter-spacing:.01em;
+      position:relative; z-index:1;
+    }
+    .mini p{margin:10px 0 0; color:var(--muted); line-height:1.6; position:relative; z-index:1}
+    .price-row{
+      margin-top:14px;
+      display:flex; align-items:center; justify-content:space-between;
+      font-size:14px; color:var(--muted);
+      position:relative; z-index:1;
+    }
+    .price-row b{color:var(--text)}
+    .mini-link{display:block; text-decoration:none; color:inherit;}
+
+    /* Membership block */
+    .membership{margin-top:18px; display:grid; gap:12px;}
+    @media(min-width:980px){ .membership{grid-template-columns: 1.1fr .9fr; gap:14px} }
+
+    .lux{
+      border-radius:var(--radius);
+      background:var(--bg2);
+      box-shadow:0 0 0 1px var(--line2) inset, var(--shadow);
+      padding:18px;
+    }
+    .lux .top{display:flex; align-items:flex-end; justify-content:space-between; gap:12px;}
+    .lux .plan{font-family:"Cormorant Garamond", serif; font-size:24px; margin:0;}
+    .lux .amount{text-align:right; font-weight:750; font-size:40px; line-height:1;}
+    .lux .per{text-align:right; font-size:11px; letter-spacing:.25em; text-transform:uppercase; color:var(--muted2); margin-top:6px;}
+    .lux ul{margin:14px 0 0; padding-left:18px; color:var(--muted); line-height:1.75}
+    .lux small{display:block; margin-top:12px; color:var(--muted2); line-height:1.5}
+
+    /* Results grid */
+    .gallery{display:grid; gap:12px; margin-top:18px}
+    @media(min-width:860px){ .gallery{grid-template-columns:repeat(3, minmax(0,1fr)); gap:14px} }
+    .shot{
+      border-radius:var(--radius);
+      overflow:hidden;
+      background:rgba(255,255,255,.05);
+      box-shadow:0 0 0 1px rgba(255,255,255,.06) inset;
+      transition:transform .16s ease, box-shadow .2s ease;
+    }
+    .shot:hover{transform:translateY(-2px); box-shadow:0 0 0 1px rgba(255,255,255,.08) inset, var(--shadow)}
+    .shot img{width:100%; height:auto; display:block; aspect-ratio: 4 / 3; object-fit:cover}
+    .shot div{padding:12px; color:var(--muted); font-size:14px}
+
+    /* Forms */
+    form{margin-top:10px}
+    label{display:block; font-size:13px; color:var(--muted); margin-top:12px}
+    input, select, textarea{
+      width:100%;
+      margin-top:8px;
+      border-radius:18px;
+      padding:12px 12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:#0f1013;
+      color:var(--text);
+      outline:none;
+      transition:border-color .2s ease, box-shadow .2s ease;
+    }
+    input:focus, select:focus, textarea:focus{
+      border-color:rgba(199,167,106,.45);
+      box-shadow:0 0 0 3px rgba(199,167,106,.15);
+    }
+    textarea{min-height:120px; resize:vertical}
+    .two{display:grid; gap:10px}
+    @media(min-width:640px){ .two{grid-template-columns:repeat(2, minmax(0,1fr))} }
+
+    /* Booking layout */
+    .book-wrap{margin-top:18px; display:grid; gap:14px;}
+    @media(min-width:980px){ .book-wrap{grid-template-columns: .95fr 1.05fr;} }
+
+    .panel{
+      border-radius:var(--radius);
+      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow:0 0 0 1px rgba(255,255,255,.06) inset;
+      padding:18px;
+    }
+
+    /* Premium booking card (left) */
+    .panel-premium{
+      border-radius:var(--radius);
+      background:
+        radial-gradient(900px circle at 10% 0%, rgba(199,167,106,.10), rgba(17,18,22,0) 55%),
+        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      box-shadow:0 0 0 1px rgba(199,167,106,.18) inset, var(--shadow);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+    .panel-premium:before{
+      content:"";
+      position:absolute; inset:-1px;
+      background: radial-gradient(700px circle at 80% 20%, rgba(255,255,255,.06), transparent 55%);
+      pointer-events:none;
+    }
+
+    .form-top{
+      display:flex; align-items:flex-start; justify-content:space-between; gap:12px;
+      position:relative; z-index:1;
+    }
+    .form-top h3{margin:8px 0 0;}
+    .form-note{
+      margin-top:10px;
+      color:var(--muted);
+      line-height:1.7;
+      position:relative; z-index:1;
+    }
+
+    .avail-pill{
+      display:inline-flex; align-items:center; gap:10px;
+      border-radius:999px;
+      padding:8px 12px;
+      background:rgba(255,255,255,.06);
+      box-shadow:0 0 0 1px rgba(199,167,106,.22) inset;
+      color:var(--muted);
+      font-size:12px;
+      white-space:nowrap;
+      position:relative; z-index:1;
+    }
+    .avail-pill b{color:var(--text); font-weight:700;}
+    .avail-dot{
+      width:8px; height:8px; border-radius:99px;
+      background:var(--gold);
+      box-shadow:0 0 0 4px rgba(199,167,106,.14);
+    }
+
+    /* Trust chips */
+    .trust{
+      margin-top:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      position:relative;
+      z-index:1;
+    }
+    .chip{
+      font-size:12px;
+      color:var(--muted);
+      background:rgba(255,255,255,.05);
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:999px;
+      padding:8px 10px;
+    }
+
+    /* Better submit */
+    .submit-row{
+      margin-top:14px;
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+      position:relative; z-index:1;
+    }
+    .helper{
+      font-size:12px;
+      color:var(--muted2);
+      line-height:1.4;
+    }
+
+    /* ===== Custom booking time slots (Lusso aesthetic) ===== */
+    .slots{
+      margin-top:10px;
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap:10px;
+    }
+    @media(min-width:640px){
+      .slots{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    }
+    .slot{
+      border-radius:16px;
+      padding:12px 10px;
+      text-align:center;
+      font-weight:750;
+      font-size:13px;
+      color:var(--text);
+      background:rgba(255,255,255,.05);
+      box-shadow:0 0 0 1px rgba(255,255,255,.07) inset;
+      transition:transform .16s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
+      user-select:none;
+      cursor:pointer;
+      position:relative;
+      overflow:hidden;
+    }
+    .slot:hover{
+      transform:translateY(-1px);
+      background:rgba(255,255,255,.08);
+      box-shadow:0 0 0 1px rgba(199,167,106,.18) inset, var(--shadow);
+    }
+    .slot.selected{
+      background:rgba(199,167,106,.16);
+      box-shadow:0 0 0 1px rgba(199,167,106,.42) inset, var(--shadow);
+    }
+    .slot.booked{
+      cursor:not-allowed;
+      opacity:.42;
+      transform:none !important;
+      background:rgba(255,255,255,.035);
+      box-shadow:0 0 0 1px rgba(255,255,255,.06) inset;
+    }
+    .slot.booked:after{
+      content:"Booked";
+      position:absolute;
+      top:8px; right:10px;
+      font-size:10px;
+      letter-spacing:.18em;
+      text-transform:uppercase;
+      color:rgba(255,255,255,.60);
+    }
+
+    footer{
+      border-top:1px solid rgba(255,255,255,.06);
+      padding:22px 0 80px;
+      color:var(--muted2);
+      font-size:12px;
+    }
+    .foot-row{display:flex; flex-direction:column; gap:10px}
+    @media(min-width:780px){ .foot-row{flex-direction:row; align-items:center; justify-content:space-between} }
+    .foot-links{display:flex; gap:14px; flex-wrap:wrap}
+    .foot-links a{color:var(--muted2); text-decoration:none}
+    .foot-links a:hover{color:var(--text)}
+
+    /* Mobile bar (kept minimal + aesthetic) */
+    .bar{
+      position:fixed; left:0; right:0; bottom:0; z-index:60;
+      background:rgba(11,11,12,.82);
+      backdrop-filter: blur(10px);
+      border-top:1px solid rgba(255,255,255,.10);
+      padding:10px 12px;
+      display:grid; grid-template-columns:repeat(3, minmax(0,1fr));
+      gap:10px;
+    }
+    .bar a{
+      text-decoration:none;
+      border-radius:14px;
+      padding:12px 10px;
+      text-align:center;
+      font-weight:800;
+      color:var(--text);
+      background:rgba(255,255,255,.06);
+      box-shadow:0 0 0 1px rgba(255,255,255,.06) inset;
+    }
+    .bar a:last-child{
+      background:var(--gold);
+      color:#0b0b0c;
+      box-shadow:none;
+    }
+    @media(min-width:780px){ .bar{display:none} }
+  </style>
+</head>
+
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+  <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+  <header>
+    <div class="wrap">
+      <div class="row">
+        <a class="brand" href="#top">
+          <div class="logo"><span>L</span></div>
+          <div>
+            <div class="brand-title">Lusso Auto Studio</div>
+            <div class="brand-sub">Private Mobile Care • KWC</div>
+          </div>
+        </a>
+
+        <nav aria-label="Primary">
+          <a href="#services">Services</a>
+          <a href="#membership">Membership</a>
+          <a href="#results">Results</a>
+          <a href="#book">Book</a>
+          <a class="btn btn-gold btn-sm" href="#apply">Request Access →</a>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="wrap">
+        <div class="grid">
+          <div>
+            <div class="pill"><span class="dot"></span> Appointment only • Limited monthly capacity</div>
+
+            <h1>Luxury-level <span style="color:var(--gold)">mobile</span> detailing, kept effortless.</h1>
+
+            <p class="lead">
+              Lusso Auto Studio delivers quiet, precise automotive care across Kitchener–Waterloo–Cambridge —
+              designed for clients who prefer consistency over convenience-store washes.
+            </p>
+
+            <div class="actions">
+              <a class="btn btn-gold" href="#book">Book One-Time Detail</a>
+              <a class="btn btn-ghost" href="#services">View Services</a>
+            </div>
+
+            <div class="stats">
+              <div class="stat"><small>Insured</small><b>Peace of mind</b></div>
+              <div class="stat"><small>Mobile</small><b>At your home</b></div>
+              <div class="stat"><small>Quiet luxury</small><b>Refined finish</b></div>
+              <div class="stat"><small>Priority</small><b>Members first</b></div>
+            </div>
+          </div>
+
+          <div class="card">
+            <img
+              src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1400&q=70"
+              alt="Luxury vehicle detail close-up"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="card-body">
+              <div class="kicker">Signature standard</div>
+              <div class="card-title">Maintenance that stays immaculate</div>
+              <p class="card-text">
+                Biweekly visits. Subtle, consistent care. Your vehicle always looks “ready.”
+              </p>
+
+              <div class="divider"></div>
+
+              <div class="card-actions">
+                <a class="btn btn-ghost" href="#membership">Explore Membership</a>
+                <a class="btn btn-gold" href="#book">Book One-Time Detail</a>
+              </div>
+
+              <p style="margin:14px 0 0; color:var(--muted2); font-size:12px; line-height:1.5">
+                Tip: swap this image with your real work (same angles, same lighting) for the highest conversion.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="section" style="border-top:1px solid rgba(255,255,255,.06);">
+      <div class="wrap">
+        <div class="section-top">
+          <div class="eyebrow">Services</div>
+          <h2>Crafted for clients who dislike compromise.</h2>
+          <p class="subtext">One vehicle at a time. Calm process. Clean results. Membership clients receive priority scheduling.</p>
+        </div>
+
+        <div class="cards3">
+          <a class="mini mini-link" href="#book">
+            <h3>Interior Deep Clean</h3>
+            <p>Vacuum + blow-out, touch-point steam, plastics/leather care, interior glass.</p>
+            <div class="price-row"><span>Starting from</span><b>$150+</b></div>
+          </a>
+
+          <a class="mini mini-link" href="#book" style="background:var(--bg2); box-shadow:0 0 0 1px var(--line2) inset, var(--shadow);">
+            <h3>Full Detail</h3>
+            <p>Interior deep clean + safe exterior wash, wheels/tires, refined sealant finish.</p>
+            <div class="price-row"><span>Starting from</span><b>$230+</b></div>
+          </a>
+
+          <a class="mini mini-link" href="#book">
+            <h3>Add-Ons</h3>
+            <p style="margin-top:10px">Pet hair +$40 • Odour +$50 • Headlights +$100</p>
+            <div class="price-row"><span>Available with</span><b>Most services</b></div>
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="membership" class="section" style="border-top:1px solid rgba(255,255,255,.06);">
+      <div class="wrap">
+        <div class="section-top">
+          <div class="eyebrow">Membership</div>
+          <h2>Lusso Maintenance Membership</h2>
+          <p class="subtext">For clients who prefer their vehicle to stay quietly immaculate—without rebooking, reminders, or chasing availability.</p>
+        </div>
+
+        <div class="membership">
+          <div class="lux">
+            <div class="top">
+              <p class="plan">Elite Biweekly Care</p>
+              <div>
+                <div class="amount">$200</div>
+                <div class="per">per month</div>
+              </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <ul>
+              <li>2 visits per month (biweekly)</li>
+              <li>Exterior safe hand wash + dry</li>
+              <li>Wheels & tires cleaned + dressed</li>
+              <li>Interior vacuum + touch-point wipe</li>
+              <li>Windows (inside & out)</li>
+            </ul>
+
+            <small>
+              Limited roster • Recommended minimum commitment: <b style="color:var(--text)">3 months</b>
+            </small>
+
+            <div class="card-actions" style="margin-top:14px">
+              <a class="btn btn-gold" href="#apply">Request Membership Access</a>
+              <a class="btn btn-ghost" href="#book">Start with One-Time Detail</a>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="eyebrow" style="margin-bottom:8px">Who it’s for</div>
+            <h3 style="margin:0; font-family:'Cormorant Garamond',serif; font-size:24px; letter-spacing:.01em;">Designed for premium households</h3>
+            <p style="margin:10px 0 0; color:var(--muted); line-height:1.65;">
+              This membership is built for clients who value time, consistency, and a refined finish — not bargain pricing.
+            </p>
+            <div class="divider"></div>
+            <p style="margin:0; color:var(--muted); line-height:1.65;">
+              <b style="color:var(--text)">Ideal:</b> detached homes, private parking, luxury & performance vehicles, busy professionals.<br>
+              <b style="color:var(--text)">Not ideal:</b> no parking access, heavy pet hair every visit, “cheapest price” shoppers.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="results" class="section" style="border-top:1px solid rgba(255,255,255,.06);">
+      <div class="wrap">
+        <div class="section-top">
+          <div class="eyebrow">Results</div>
+          <h2>Quiet transformations.</h2>
+          <p class="subtext">Replace these placeholders with your real before/after shots. Elite clients respond to clarity, not hype.</p>
+        </div>
+
+        <div class="gallery">
+          <div class="shot">
+            <img src="https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?auto=format&fit=crop&w=1200&q=70"
+                 alt="Detailing result 1" loading="lazy" decoding="async" />
+            <div>Interior reset • Touch points</div>
+          </div>
+          <div class="shot">
+            <img src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1200&q=70"
+                 alt="Detailing result 2" loading="lazy" decoding="async" />
+            <div>Refined wash • Gloss finish</div>
+          </div>
+          <div class="shot">
+            <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=70"
+                 alt="Detailing result 3" loading="lazy" decoding="async" />
+            <div>Wheels • Tire finish</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BOOKING: Custom booking UI + API-backed availability -->
+    <section id="book" class="section" style="border-top:1px solid rgba(255,255,255,.06);">
+      <div class="wrap">
+        <div class="section-top">
+          <div class="eyebrow">Booking</div>
+          <h2>Book directly — with live availability.</h2>
+          <p class="subtext">Booked times are greyed out in real-time. No double booking. We confirm details by text.</p>
+        </div>
+
+        <div class="book-wrap">
+          <!-- Left: One-time booking (custom) -->
+          <div class="panel-premium">
+            <div class="form-top">
+              <div style="position:relative; z-index:1;">
+                <div class="eyebrow">Concierge scheduling</div>
+                <h3 style="font-family:'Cormorant Garamond',serif; font-size:26px; letter-spacing:.01em;">
+                  Reserve your appointment
+                </h3>
+                <p class="form-note">
+                  Select your service, choose a date, then pick an available time. Booked slots appear grey.
+                </p>
+              </div>
+
+              <div class="avail-pill" title="Availability updates live" style="position:relative; z-index:1;">
+                <span class="avail-dot"></span>
+                <span><b>Live:</b> Updated</span>
+              </div>
+            </div>
+
+            <div id="lussoBooking" style="position:relative; z-index:1;">
+              <div class="two">
+                <div>
+                  <label for="bk_name">Name</label>
+                  <input id="bk_name" name="name" placeholder="Your name" required />
+                </div>
+                <div>
+                  <label for="bk_phone">Phone</label>
+                  <input id="bk_phone" name="phone" placeholder="(xxx) xxx-xxxx" required />
+                </div>
+              </div>
+
+              <div class="two">
+                <div>
+                  <label for="bk_vehicle">Vehicle</label>
+                  <input id="bk_vehicle" name="vehicle" placeholder="e.g., BMW X5 / Tesla Model 3" required />
+                </div>
+                <div>
+                  <label for="bk_city">City</label>
+                  <input id="bk_city" name="city" placeholder="Cambridge / Waterloo / Kitchener" required />
+                </div>
+              </div>
+
+              <div class="two">
+                <div>
+                  <label for="bk_service">Service</label>
+                  <select id="bk_service" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="Interior Deep Clean">Interior Deep Clean</option>
+                    <option value="Full Detail">Full Detail</option>
+                    <option value="Maintenance Wash">Maintenance Wash</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="bk_date">Date</label>
+                  <input id="bk_date" type="date" required />
+                </div>
+              </div>
+
+              <div>
+                <label>Time</label>
+                <div class="slots" id="slotGrid" aria-label="Available time slots"></div>
+                <div class="helper" id="slotHint" style="margin-top:8px;">
+                  Select a date to view availability. Booked slots appear grey.
+                </div>
+              </div>
+
+              <div>
+                <label for="bk_notes">Notes (optional)</label>
+                <textarea id="bk_notes" placeholder="Pet hair? salt stains? underground parking? add-ons?"></textarea>
+              </div>
+
+              <div class="submit-row">
+                <a class="btn btn-gold" href="javascript:void(0)" id="bk_submitBtn" role="button" aria-label="Confirm appointment">
+                  Confirm Appointment →
+                </a>
+                <div class="helper" id="bk_status">Live availability • appointment-only</div>
+              </div>
+
+              <div class="trust" aria-label="Booking assurances">
+                <span class="chip">Booked slots greyed</span>
+                <span class="chip">No double booking</span>
+                <span class="chip">Confirmation text</span>
+              </div>
+
+              <p style="margin:12px 0 0; color:var(--muted2); line-height:1.6; font-size:13px;">
+                Your booking is reserved immediately after confirmation. If a slot is taken while you’re selecting, it will update live.
+              </p>
+            </div>
+          </div>
+
+          <!-- Right: Membership application (kept) -->
+          <div id="apply" class="panel" style="box-shadow:0 0 0 1px var(--line2) inset, var(--shadow); background:var(--bg2);">
+            <div class="form-top">
+              <div>
+                <div class="eyebrow">Request access</div>
+                <h3 style="font-family:'Cormorant Garamond',serif; font-size:26px; letter-spacing:.01em;">
+                  Membership application
+                </h3>
+                <p class="form-note">
+                  Share a few details — we’ll confirm fit and availability within 24 hours.
+                </p>
+              </div>
+
+              <div class="avail-pill" title="Membership clients are scheduled first">
+                <span class="avail-dot"></span>
+                <span><b>Priority:</b> Members first</span>
+              </div>
+            </div>
+
+            <form id="membershipForm" action="#" method="POST">
+              <div class="two">
+                <div>
+                  <label for="name">Name</label>
+                  <input id="name" name="name" placeholder="Your name" required />
+                </div>
+                <div>
+                  <label for="phone">Phone</label>
+                  <input id="phone" name="phone" placeholder="(xxx) xxx-xxxx" required />
+                </div>
+              </div>
+
+              <div class="two">
+                <div>
+                  <label for="vehicle">Vehicle</label>
+                  <input id="vehicle" name="vehicle" placeholder="e.g., Tesla Model Y" required />
+                </div>
+                <div>
+                  <label for="city">City</label>
+                  <input id="city" name="city" placeholder="Cambridge / Waterloo / Kitchener" required />
+                </div>
+              </div>
+
+              <div class="two">
+                <div>
+                  <label for="parking">Parking access</label>
+                  <select id="parking" name="parking" required>
+                    <option value="" disabled selected>Select</option>
+                    <option>Private driveway</option>
+                    <option>Private garage</option>
+                    <option>Condo / underground</option>
+                    <option>Other</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="start">Preferred start</label>
+                  <select id="start" name="start" required>
+                    <option value="" disabled selected>Select</option>
+                    <option>Within 7 days</option>
+                    <option>2–3 weeks</option>
+                    <option>Next month</option>
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label for="msg">Anything we should know?</label>
+                <textarea id="msg" name="message" placeholder="Two vehicles? preferred days? recurring needs?"></textarea>
+              </div>
+
+              <div class="submit-row">
+                <a class="btn btn-gold" href="javascript:void(0)" id="submitBtn" role="button" aria-label="Submit membership request">
+                  Submit Request →
+                </a>
+                <div class="helper">We’ll text you to confirm next steps.</div>
+              </div>
+
+              <p style="margin:12px 0 0; color:var(--muted2); font-size:12px; line-height:1.5;">
+                By submitting, you agree to be contacted for scheduling and quoting. Appointment-only. Limited roster.
+              </p>
+
+              <button type="submit" id="realSubmit" style="display:none">Submit</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="wrap">
+        <div class="foot-row">
+          <div>
+            <div class="brand-title" style="font-size:20px">Lusso Auto Studio</div>
+            <div class="brand-sub">Private mobile automotive care • KWC</div>
+          </div>
+          <div class="foot-links">
+            <a href="#services">Services</a>
+            <a href="#membership">Membership</a>
+            <a href="#results">Results</a>
+            <a href="#book">Book</a>
+          </div>
+        </div>
+        <div style="margin-top:14px;">© <span id="year"></span> Lusso Auto Studio. All rights reserved.</div>
+      </div>
+    </footer>
+
+    <!-- Mobile bar (aligned with on-site booking) -->
+    <div class="bar" aria-label="Mobile quick actions">
+      <a href="#services">Services</a>
+      <a href="#book">Book</a>
+      <a href="#apply">Apply</a>
+    </div>
+  </main>
+
+  <script>
+    // Year
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    // Bulletproof in-page link scrolling (Safari-safe, works even if smooth-scroll is off)
+    document.addEventListener("click", function(e){
+      var a = e.target.closest && e.target.closest('a[href^="#"]');
+      if(!a) return;
+      var id = a.getAttribute("href");
+      if(!id || id === "#") return;
+      var el = document.querySelector(id);
+      if(!el) return;
+      e.preventDefault();
+      el.scrollIntoView({ behavior: "smooth", block: "start" });
+      history.pushState(null, "", id);
+    }, {passive:false});
+
+    // Cursor glow (desktop)
+    (function(){
+      var glow = document.getElementById("cursorGlow");
+      if(!glow) return;
+      var canHover = window.matchMedia("(hover:hover) and (pointer:fine)").matches;
+      if(!canHover) return;
+
+      var targetX = 0.5, targetY = 0.25;
+      var currentX = 0.5, currentY = 0.25;
+      var raf = null;
+
+      function setVars(x,y){
+        glow.style.setProperty("--x", (x*100).toFixed(2) + "%");
+        glow.style.setProperty("--y", (y*100).toFixed(2) + "%");
+      }
+      function tick(){
+        var ease = 0.085;
+        currentX += (targetX - currentX) * ease;
+        currentY += (targetY - currentY) * ease;
+        setVars(currentX, currentY);
+        raf = requestAnimationFrame(tick);
+      }
+      window.addEventListener("mousemove", function(e){
+        targetX = e.clientX / window.innerWidth;
+        targetY = e.clientY / window.innerHeight;
+        if(!raf) raf = requestAnimationFrame(tick);
+      }, {passive:true});
+    })();
+
+    // Membership submit (Safari friendly)
+    document.getElementById("submitBtn").addEventListener("click", function(){
+      document.getElementById("realSubmit").click();
+    });
+
+    // ===== Custom booking (API-backed) =====
+    (function(){
+      // IMPORTANT: you must deploy API endpoints:
+      //   GET  /api/slots?from=<iso>&to=<iso>  -> { booked: [start_iso,...] }
+      //   POST /api/book  -> books, returns 409 if already booked
+      const API_BASE = "/api";
+
+      const slotGrid = document.getElementById("slotGrid");
+      const slotHint = document.getElementById("slotHint");
+      const statusEl = document.getElementById("bk_status");
+
+      const dateEl = document.getElementById("bk_date");
+      const serviceEl = document.getElementById("bk_service");
+      const submitBtn = document.getElementById("bk_submitBtn");
+
+      let selectedSlot = null; // ISO string start time (UTC)
+      let bookedSet = new Set(); // ISO strings
+
+      // Business rules (edit as you want)
+      const HOURS = { start: 8, end: 20 }; // local time window
+      const SLOT_MIN = 30; // 30 min increments
+
+      // Duration by service (minutes) - used for future availability logic / admin view
+      const SERVICE_DURATION = {
+        "Maintenance Wash": 60,
+        "Interior Deep Clean": 120,
+        "Full Detail": 180
+      };
+
+      function pad2(n){ return (n<10?"0":"")+n; }
+
+      function toLocalSlotLabel(dateObj){
+        const h = dateObj.getHours();
+        const m = dateObj.getMinutes();
+        const ampm = h >= 12 ? "PM" : "AM";
+        const hr = h % 12 || 12;
+        return `${hr}:${pad2(m)} ${ampm}`;
+      }
+
+      function buildSlotsForDate(yyyy_mm_dd){
+        const slots = [];
+        const [y, mo, d] = yyyy_mm_dd.split("-").map(Number);
+        const start = new Date(y, mo-1, d, HOURS.start, 0, 0, 0);
+        const end = new Date(y, mo-1, d, HOURS.end, 0, 0, 0);
+
+        for(let t = new Date(start); t < end; t = new Date(t.getTime() + SLOT_MIN*60000)){
+          slots.push(new Date(t));
+        }
+        return slots;
+      }
+
+      function clearSelection(){
+        selectedSlot = null;
+        const els = slotGrid.querySelectorAll(".slot");
+        els.forEach(e => e.classList.remove("selected"));
+      }
+
+      function renderSlots(yyyy_mm_dd){
+        slotGrid.innerHTML = "";
+        clearSelection();
+
+        const slots = buildSlotsForDate(yyyy_mm_dd);
+        if(slots.length === 0){
+          slotHint.textContent = "No slots available for this date.";
+          return;
+        }
+
+        slotHint.textContent = "Select a time. Booked slots are greyed out.";
+        slots.forEach(dt => {
+          const iso = dt.toISOString(); // UTC
+          const div = document.createElement("div");
+          div.className = "slot";
+          div.textContent = toLocalSlotLabel(dt);
+
+          if(bookedSet.has(iso)){
+            div.classList.add("booked");
+          } else {
+            div.addEventListener("click", () => {
+              const all = slotGrid.querySelectorAll(".slot");
+              all.forEach(e => e.classList.remove("selected"));
+              div.classList.add("selected");
+              selectedSlot = iso;
+              statusEl.textContent = "Selected: " + div.textContent + " • tap Confirm to book";
+            });
+          }
+
+          slotGrid.appendChild(div);
+        });
+      }
+
+      async function loadBooked(yyyy_mm_dd){
+        statusEl.textContent = "Checking availability…";
+        bookedSet = new Set();
+        clearSelection();
+
+        const [y, mo, d] = yyyy_mm_dd.split("-").map(Number);
+        const dayStartLocal = new Date(y, mo-1, d, 0, 0, 0, 0);
+        const dayEndLocal = new Date(y, mo-1, d, 23, 59, 59, 999);
+
+        const url = `${API_BASE}/slots?from=${encodeURIComponent(dayStartLocal.toISOString())}&to=${encodeURIComponent(dayEndLocal.toISOString())}`;
+        let res;
+        try{
+          res = await fetch(url, { headers: { "Accept": "application/json" } });
+        }catch(e){
+          statusEl.textContent = "Availability unavailable (network).";
+          return;
+        }
+
+        if(!res.ok){
+          statusEl.textContent = "Availability unavailable (API).";
+          return;
+        }
+
+        const data = await res.json().catch(()=>({}));
+        (data.booked || []).forEach(iso => bookedSet.add(iso));
+        statusEl.textContent = "Live availability • updated";
+      }
+
+      async function bookNow(){
+        const name = document.getElementById("bk_name").value.trim();
+        const phone = document.getElementById("bk_phone").value.trim();
+        const vehicle = document.getElementById("bk_vehicle").value.trim();
+        const city = document.getElementById("bk_city").value.trim();
+        const service = serviceEl.value;
+        const notes = document.getElementById("bk_notes").value.trim();
+        const dateVal = dateEl.value;
+
+        if(!name || !phone || !vehicle || !city || !service || !dateVal || !selectedSlot){
+          statusEl.textContent = "Please fill details + select a time.";
+          return;
+        }
+
+        submitBtn.style.pointerEvents = "none";
+        submitBtn.style.opacity = ".85";
+        statusEl.textContent = "Placing your booking…";
+
+        const payload = {
+          name, phone, vehicle, city, service, notes,
+          start_iso: selectedSlot,
+          duration_min: SERVICE_DURATION[service] || 60
+        };
+
+        let res, out;
+        try{
+          res = await fetch(`${API_BASE}/book`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Accept": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          out = await res.json().catch(()=> ({}));
+        }catch(e){
+          statusEl.textContent = "Booking failed (network). Try again.";
+          submitBtn.style.pointerEvents = "auto";
+          submitBtn.style.opacity = "1";
+          return;
+        }
+
+        if(res.status === 409){
+          statusEl.textContent = "That slot was just booked. Please choose another.";
+          await loadBooked(dateVal);
+          renderSlots(dateVal);
+        } else if(!res.ok){
+          statusEl.textContent = out.error || "Booking failed. Try again.";
+        } else {
+          statusEl.textContent = "Confirmed. You’re booked — we’ll text you shortly.";
+          await loadBooked(dateVal);
+          renderSlots(dateVal);
+        }
+
+        submitBtn.style.pointerEvents = "auto";
+        submitBtn.style.opacity = "1";
+      }
+
+      // Min date = today (local)
+      const now = new Date();
+      dateEl.min = `${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;
+
+      dateEl.addEventListener("change", async () => {
+        const v = dateEl.value;
+        if(!v) return;
+        await loadBooked(v);
+        renderSlots(v);
+      });
+
+      serviceEl.addEventListener("change", () => {
+        if(serviceEl.value){
+          const mins = SERVICE_DURATION[serviceEl.value] || 60;
+          statusEl.textContent = `Service duration: ~${mins} min • Select a time`;
+        }
+      });
+
+      submitBtn.addEventListener("click", bookNow);
+    })();
+  </script>
+</body>
+</html>
