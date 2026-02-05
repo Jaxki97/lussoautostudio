@@ -473,7 +473,7 @@
       line-height:1.4;
     }
 
-    /* ===== Custom booking time slots (Lusso aesthetic) ===== */
+    /* ===== Booking time slots (Lusso aesthetic) ===== */
     .slots{
       margin-top:10px;
       display:grid;
@@ -536,7 +536,7 @@
     .foot-links a{color:var(--muted2); text-decoration:none}
     .foot-links a:hover{color:var(--text)}
 
-    /* Mobile bar (kept minimal + aesthetic) */
+    /* Mobile bar */
     .bar{
       position:fixed; left:0; right:0; bottom:0; z-index:60;
       background:rgba(11,11,12,.82);
@@ -760,17 +760,17 @@
       </div>
     </section>
 
-    <!-- BOOKING: Custom booking UI + API-backed availability -->
+    <!-- BOOKING -->
     <section id="book" class="section" style="border-top:1px solid rgba(255,255,255,.06);">
       <div class="wrap">
         <div class="section-top">
           <div class="eyebrow">Booking</div>
           <h2>Book directly — with live availability.</h2>
-          <p class="subtext">Booked times are greyed out in real-time. No double booking. We confirm details by text.</p>
+          <p class="subtext">Booked times are greyed out. No double booking. We confirm details by text.</p>
         </div>
 
         <div class="book-wrap">
-          <!-- Left: One-time booking (custom) -->
+          <!-- Left: One-time booking -->
           <div class="panel-premium">
             <div class="form-top">
               <div style="position:relative; z-index:1;">
@@ -779,7 +779,7 @@
                   Reserve your appointment
                 </h3>
                 <p class="form-note">
-                  Select your service, choose a date, then pick an available time. Booked slots appear grey.
+                  Select your service, choose a date, then pick an available start time. We block the right hours automatically.
                 </p>
               </div>
 
@@ -793,22 +793,22 @@
               <div class="two">
                 <div>
                   <label for="bk_name">Name</label>
-                  <input id="bk_name" name="name" placeholder="Your name" required />
+                  <input id="bk_name" placeholder="Your name" required />
                 </div>
                 <div>
                   <label for="bk_phone">Phone</label>
-                  <input id="bk_phone" name="phone" placeholder="(xxx) xxx-xxxx" required />
+                  <input id="bk_phone" placeholder="(xxx) xxx-xxxx" required />
                 </div>
               </div>
 
               <div class="two">
                 <div>
                   <label for="bk_vehicle">Vehicle</label>
-                  <input id="bk_vehicle" name="vehicle" placeholder="e.g., BMW X5 / Tesla Model 3" required />
+                  <input id="bk_vehicle" placeholder="e.g., BMW X5 / Tesla Model 3" required />
                 </div>
                 <div>
                   <label for="bk_city">City</label>
-                  <input id="bk_city" name="city" placeholder="Cambridge / Waterloo / Kitchener" required />
+                  <input id="bk_city" placeholder="Cambridge / Waterloo / Kitchener" required />
                 </div>
               </div>
 
@@ -829,10 +829,10 @@
               </div>
 
               <div>
-                <label>Time</label>
+                <label>Start time</label>
                 <div class="slots" id="slotGrid" aria-label="Available time slots"></div>
                 <div class="helper" id="slotHint" style="margin-top:8px;">
-                  Select a date to view availability. Booked slots appear grey.
+                  Select service + date to view availability. Booked slots appear grey.
                 </div>
               </div>
 
@@ -849,9 +849,9 @@
               </div>
 
               <div class="trust" aria-label="Booking assurances">
+                <span class="chip">Weekend-only</span>
+                <span class="chip">30-day window</span>
                 <span class="chip">Booked slots greyed</span>
-                <span class="chip">No double booking</span>
-                <span class="chip">Confirmation text</span>
               </div>
 
               <p style="margin:12px 0 0; color:var(--muted2); line-height:1.6; font-size:13px;">
@@ -860,7 +860,7 @@
             </div>
           </div>
 
-          <!-- Right: Membership application (kept) -->
+          <!-- Right: Membership application (clean, no slot UI here) -->
           <div id="apply" class="panel" style="box-shadow:0 0 0 1px var(--line2) inset, var(--shadow); background:var(--bg2);">
             <div class="form-top">
               <div>
@@ -913,46 +913,15 @@
                     <option>Other</option>
                   </select>
                 </div>
+
                 <div>
-                  <label for="b_start">Select start time</label>
-                  <select id="b_start" name="start_hour" required>
-                    <option value="" disabled selected>Select start time</option>
+                  <label for="start">Preferred start</label>
+                  <select id="start" name="start" required>
+                    <option value="" disabled selected>Select</option>
+                    <option>Within 7 days</option>
+                    <option>2–3 weeks</option>
+                    <option>Next month</option>
                   </select>
-                  
-                  <div id="slotInfo" style="font-size:12px;opacity:.7;margin-top:6px;">
-Available slots will load after you select a date & service
-                  </div>
-                  <div id="slotGrid" style="margin-top:12px; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px;"></div>
-
-<style>
-  .slot-btn{
-    border-radius:14px;
-    padding:12px 10px;
-    text-align:center;
-    font-weight:800;
-    font-size:13px;
-    border:1px solid rgba(255,255,255,.10);
-    background:rgba(255,255,255,.06);
-    color:rgba(255,255,255,.92);
-    cursor:pointer;
-    transition:transform .12s ease, background .2s ease, opacity .2s ease, border-color .2s ease;
-  }
-  .slot-btn:hover{transform:translateY(-1px); background:rgba(255,255,255,.09);}
-  .slot-btn:active{transform:scale(.99);}
-  .slot-btn.booked{
-    cursor:not-allowed;
-    opacity:.45;
-    background:rgba(255,255,255,.04);
-    border-color:rgba(255,255,255,.08);
-    text-decoration:line-through;
-  }
-  .slot-btn.selected{
-    background:rgba(199,167,106,.18);
-    border-color:rgba(199,167,106,.35);
-  }
-</style>
-
-
                 </div>
               </div>
 
@@ -997,7 +966,7 @@ Available slots will load after you select a date & service
       </div>
     </footer>
 
-    <!-- Mobile bar (aligned with on-site booking) -->
+    <!-- Mobile bar -->
     <div class="bar" aria-label="Mobile quick actions">
       <a href="#services">Services</a>
       <a href="#book">Book</a>
@@ -1009,7 +978,7 @@ Available slots will load after you select a date & service
     // Year
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // Bulletproof in-page link scrolling (Safari-safe, works even if smooth-scroll is off)
+    // Bulletproof in-page link scrolling (Safari-safe)
     document.addEventListener("click", function(e){
       var a = e.target.closest && e.target.closest('a[href^="#"]');
       if(!a) return;
@@ -1056,122 +1025,131 @@ Available slots will load after you select a date & service
       document.getElementById("realSubmit").click();
     });
 
-    // ===== Custom booking (API-backed) =====
+    // =========================
+    // FINAL BOOKING (uses /api/slots + /api/book)
+    // =========================
     (function(){
-      // IMPORTANT: you must deploy API endpoints:
-      //   GET  /api/slots?from=<iso>&to=<iso>  -> { booked: [start_iso,...] }
-      //   POST /api/book  -> books, returns 409 if already booked
-      const API_BASE = "/api";
+      const serviceDurations = {
+        "Interior Deep Clean": 2,
+        "Full Detail": 4,
+        "Maintenance Wash": 1
+      };
 
-      const slotGrid = document.getElementById("slotGrid");
-      const slotHint = document.getElementById("slotHint");
-      const statusEl = document.getElementById("bk_status");
+      const OPEN_HOUR = 8;
+      const CLOSE_HOUR = 20;
 
       const dateEl = document.getElementById("bk_date");
       const serviceEl = document.getElementById("bk_service");
+      const slotGrid = document.getElementById("slotGrid");
+      const slotHint = document.getElementById("slotHint");
+      const statusEl = document.getElementById("bk_status");
       const submitBtn = document.getElementById("bk_submitBtn");
 
-      let selectedSlot = null; // ISO string start time (UTC)
-      let bookedSet = new Set(); // ISO strings
+      let selectedHour = null;
 
-      // Business rules (edit as you want)
-      const HOURS = { start: 8, end: 20 }; // local time window
-      const SLOT_MIN = 30; // 30 min increments
+      function pad2(n){ return (n<10 ? "0" : "") + n; }
 
-      // Duration by service (minutes) - used for future availability logic / admin view
-      const SERVICE_DURATION = {
-        "Maintenance Wash": 60,
-        "Interior Deep Clean": 120,
-        "Full Detail": 180
-      };
-
-      function pad2(n){ return (n<10?"0":"")+n; }
-
-      function toLocalSlotLabel(dateObj){
-        const h = dateObj.getHours();
-        const m = dateObj.getMinutes();
+      function formatHour(h){
         const ampm = h >= 12 ? "PM" : "AM";
-        const hr = h % 12 || 12;
-        return `${hr}:${pad2(m)} ${ampm}`;
+        const hr = ((h + 11) % 12) + 1;
+        return `${hr}:00 ${ampm}`;
       }
 
-      function buildSlotsForDate(yyyy_mm_dd){
-        const slots = [];
-        const [y, mo, d] = yyyy_mm_dd.split("-").map(Number);
-        const start = new Date(y, mo-1, d, HOURS.start, 0, 0, 0);
-        const end = new Date(y, mo-1, d, HOURS.end, 0, 0, 0);
-
-        for(let t = new Date(start); t < end; t = new Date(t.getTime() + SLOT_MIN*60000)){
-          slots.push(new Date(t));
-        }
-        return slots;
+      function isWeekend(dateStr){
+        const d = new Date(dateStr + "T00:00:00");
+        const day = d.getDay();
+        return day === 0 || day === 6;
       }
 
-      function clearSelection(){
-        selectedSlot = null;
-        const els = slotGrid.querySelectorAll(".slot");
-        els.forEach(e => e.classList.remove("selected"));
+      function within30Days(dateStr){
+        const now = new Date();
+        const target = new Date(dateStr + "T00:00:00");
+        const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const diff = (target - start) / (1000 * 60 * 60 * 24);
+        return diff >= 0 && diff <= 30;
       }
 
-      function renderSlots(yyyy_mm_dd){
+      function clearSlots(msg){
         slotGrid.innerHTML = "";
-        clearSelection();
+        selectedHour = null;
+        if(msg) slotHint.textContent = msg;
+      }
 
-        const slots = buildSlotsForDate(yyyy_mm_dd);
-        if(slots.length === 0){
-          slotHint.textContent = "No slots available for this date.";
+      async function loadSlots(){
+        const date = dateEl.value;
+        const service = serviceEl.value;
+
+        if(!date || !service){
+          clearSlots("Select service + date to view availability.");
+          statusEl.textContent = "Live availability • appointment-only";
           return;
         }
 
-        slotHint.textContent = "Select a time. Booked slots are greyed out.";
-        slots.forEach(dt => {
-          const iso = dt.toISOString(); // UTC
+        if(!isWeekend(date)){
+          clearSlots("Bookings are available on weekends only.");
+          statusEl.textContent = "Weekend-only scheduling";
+          return;
+        }
+
+        if(!within30Days(date)){
+          clearSlots("Bookings are available within the next 30 days only.");
+          statusEl.textContent = "30-day window enabled";
+          return;
+        }
+
+        const duration = serviceDurations[service] || 2;
+        statusEl.textContent = "Checking availability…";
+        slotHint.textContent = `Loading slots… (blocks ${duration} hour${duration>1?"s":""})`;
+
+        let res, data;
+        try{
+          res = await fetch(`/api/slots?date=${encodeURIComponent(date)}&duration_hours=${duration}`, {
+            headers: { "Accept": "application/json" }
+          });
+          data = await res.json();
+        }catch(e){
+          clearSlots("Availability unavailable (network).");
+          statusEl.textContent = "Availability error";
+          return;
+        }
+
+        if(!res.ok || !data?.ok){
+          clearSlots(data?.error || "Availability unavailable (API).");
+          statusEl.textContent = "Availability error";
+          return;
+        }
+
+        const slots = data.slots || [];
+        slotGrid.innerHTML = "";
+        selectedHour = null;
+
+        if(slots.length === 0){
+          clearSlots("No available slots for that date.");
+          statusEl.textContent = "No slots";
+          return;
+        }
+
+        slotHint.textContent = `Select a start time. (blocks ${duration} hour${duration>1?"s":""})`;
+        statusEl.textContent = "Live availability • updated";
+
+        slots.forEach(s => {
           const div = document.createElement("div");
           div.className = "slot";
-          div.textContent = toLocalSlotLabel(dt);
+          div.textContent = formatHour(s.start_hour);
 
-          if(bookedSet.has(iso)){
+          if(s.status === "booked"){
             div.classList.add("booked");
           } else {
             div.addEventListener("click", () => {
-              const all = slotGrid.querySelectorAll(".slot");
-              all.forEach(e => e.classList.remove("selected"));
+              slotGrid.querySelectorAll(".slot").forEach(x => x.classList.remove("selected"));
               div.classList.add("selected");
-              selectedSlot = iso;
-              statusEl.textContent = "Selected: " + div.textContent + " • tap Confirm to book";
+              selectedHour = s.start_hour;
+              statusEl.textContent = `Selected: ${formatHour(selectedHour)} • tap Confirm`;
             });
           }
 
           slotGrid.appendChild(div);
         });
-      }
-
-      async function loadBooked(yyyy_mm_dd){
-        statusEl.textContent = "Checking availability…";
-        bookedSet = new Set();
-        clearSelection();
-
-        const [y, mo, d] = yyyy_mm_dd.split("-").map(Number);
-        const dayStartLocal = new Date(y, mo-1, d, 0, 0, 0, 0);
-        const dayEndLocal = new Date(y, mo-1, d, 23, 59, 59, 999);
-
-        const url = `${API_BASE}/slots?from=${encodeURIComponent(dayStartLocal.toISOString())}&to=${encodeURIComponent(dayEndLocal.toISOString())}`;
-        let res;
-        try{
-          res = await fetch(url, { headers: { "Accept": "application/json" } });
-        }catch(e){
-          statusEl.textContent = "Availability unavailable (network).";
-          return;
-        }
-
-        if(!res.ok){
-          statusEl.textContent = "Availability unavailable (API).";
-          return;
-        }
-
-        const data = await res.json().catch(()=>({}));
-        (data.booked || []).forEach(iso => bookedSet.add(iso));
-        statusEl.textContent = "Live availability • updated";
       }
 
       async function bookNow(){
@@ -1181,26 +1159,38 @@ Available slots will load after you select a date & service
         const city = document.getElementById("bk_city").value.trim();
         const service = serviceEl.value;
         const notes = document.getElementById("bk_notes").value.trim();
-        const dateVal = dateEl.value;
+        const date = dateEl.value;
 
-        if(!name || !phone || !vehicle || !city || !service || !dateVal || !selectedSlot){
-          statusEl.textContent = "Please fill details + select a time.";
+        if(!name || !phone || !vehicle || !city || !service || !date){
+          statusEl.textContent = "Please fill all details first.";
           return;
         }
+        if(selectedHour === null){
+          statusEl.textContent = "Please select a start time.";
+          return;
+        }
+
+        const duration = serviceDurations[service] || 2;
 
         submitBtn.style.pointerEvents = "none";
         submitBtn.style.opacity = ".85";
         statusEl.textContent = "Placing your booking…";
 
         const payload = {
-          name, phone, vehicle, city, service, notes,
-          start_iso: selectedSlot,
-          duration_min: SERVICE_DURATION[service] || 60
+          date,
+          start_hour: selectedHour,
+          duration_hours: duration,
+          service,
+          name,
+          phone,
+          vehicle,
+          city,
+          notes
         };
 
         let res, out;
         try{
-          res = await fetch(`${API_BASE}/book`, {
+          res = await fetch("/api/book", {
             method: "POST",
             headers: { "Content-Type": "application/json", "Accept": "application/json" },
             body: JSON.stringify(payload)
@@ -1215,164 +1205,30 @@ Available slots will load after you select a date & service
 
         if(res.status === 409){
           statusEl.textContent = "That slot was just booked. Please choose another.";
-          await loadBooked(dateVal);
-          renderSlots(dateVal);
+          await loadSlots();
         } else if(!res.ok){
-          statusEl.textContent = out.error || "Booking failed. Try again.";
+          statusEl.textContent = out?.error || "Booking failed. Try again.";
         } else {
           statusEl.textContent = "Confirmed. You’re booked — we’ll text you shortly.";
-          await loadBooked(dateVal);
-          renderSlots(dateVal);
+          await loadSlots();
         }
 
         submitBtn.style.pointerEvents = "auto";
         submitBtn.style.opacity = "1";
       }
 
-      // Min date = today (local)
+      // Set min date = today
       const now = new Date();
       dateEl.min = `${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;
 
-      dateEl.addEventListener("change", async () => {
-        const v = dateEl.value;
-        if(!v) return;
-        await loadBooked(v);
-        renderSlots(v);
-      });
-
-      serviceEl.addEventListener("change", () => {
-        if(serviceEl.value){
-          const mins = SERVICE_DURATION[serviceEl.value] || 60;
-          statusEl.textContent = `Service duration: ~${mins} min • Select a time`;
-        }
-      });
-
+      // Events
+      dateEl.addEventListener("change", loadSlots);
+      serviceEl.addEventListener("change", loadSlots);
       submitBtn.addEventListener("click", bookNow);
+
+      // Initial state
+      clearSlots("Select service + date to view availability. Booked slots appear grey.");
     })();
   </script>
-  <script>
-const serviceDurations = {
-  "Essential Detail": 2,
-  "Full Detail": 4,
-  "Showroom Detail": 6,
-  "Maintenance Detail": 1
-};
-
-const OPEN_HOUR = 8;
-const CLOSE_HOUR = 20;
-
-const dateInput = document.getElementById("b_date");
-const serviceInput = document.getElementById("b_service");
-const startSelect = document.getElementById("b_start");
-const slotGrid = document.getElementById("slotGrid");
-const slotInfo = document.getElementById("slotInfo");
-const form = document.getElementById("bookingForm");
-
-function isWeekend(dateStr){
-  const d = new Date(dateStr);
-  const day = d.getDay();
-  return day === 0 || day === 6;
-}
-
-function within30Days(dateStr){
-  const now = new Date();
-  const target = new Date(dateStr);
-  const diff = (target - now)/(1000*60*60*24);
-  return diff >= 0 && diff <= 30;
-}
-
-async function loadAvailability(){
-  const date = dateInput.value;
-  const service = serviceInput.value;
-  if(!date || !service) return;
-
-  if(!isWeekend(date)){
-    slotInfo.innerText = "Bookings only available on weekends.";
-    slotGrid.innerHTML="";
-    return;
-  }
-
-  if(!within30Days(date)){
-    slotInfo.innerText = "Bookings allowed only within next 30 days.";
-    slotGrid.innerHTML="";
-    return;
-  }
-
-  const res = await fetch(`/api/availability?date=${date}`);
-  const data = await res.json();
-  const booked = data.booked || [];
-
-  const duration = serviceDurations[service] || 2;
-
-  slotGrid.innerHTML="";
-  startSelect.innerHTML=`<option value="" disabled selected>Select start time</option>`;
-
-  for(let h=OPEN_HOUR; h<=CLOSE_HOUR-duration; h++){
-    let blocked=false;
-    for(let x=0;x<duration;x++){
-      if(booked.includes(h+x)) blocked=true;
-    }
-
-    const btn=document.createElement("div");
-    btn.className="slot-btn";
-    btn.innerText=formatHour(h);
-
-    if(blocked){
-      btn.classList.add("booked");
-      btn.innerText+= " (Booked)";
-    }else{
-      btn.onclick=()=>{
-        document.querySelectorAll(".slot-btn").forEach(b=>b.classList.remove("selected"));
-        btn.classList.add("selected");
-        startSelect.value=h;
-      };
-
-      const opt=document.createElement("option");
-      opt.value=h;
-      opt.textContent=formatHour(h);
-      startSelect.appendChild(opt);
-    }
-
-    slotGrid.appendChild(btn);
-  }
-
-  slotInfo.innerText=`Service duration: ${duration} hour(s). Select a start time.`;
-}
-
-function formatHour(h){
-  const ampm = h>=12?"PM":"AM";
-  const hr = ((h+11)%12+1);
-  return `${hr}:00 ${ampm}`;
-}
-
-dateInput?.addEventListener("change",loadAvailability);
-serviceInput?.addEventListener("change",loadAvailability);
-
-form?.addEventListener("submit", async (e)=>{
-  e.preventDefault();
-
-  const fd = new FormData(form);
-  const data = Object.fromEntries(fd.entries());
-
-  const res = await fetch("/api/book",{
-    method:"POST",
-    headers:{ "Content-Type":"application/json"},
-    body: JSON.stringify(data)
-  });
-
-  const json = await res.json();
-
-  if(json.ok){
-    alert("Booking confirmed. You'll receive confirmation shortly.");
-    form.reset();
-    slotGrid.innerHTML="";
-  }else{
-    alert(json.error || "Booking failed");
-  }
-});
-</script>
-
 </body>
 </html>
-
-
