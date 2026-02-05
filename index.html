@@ -914,13 +914,45 @@
                   </select>
                 </div>
                 <div>
-                  <label for="start">Preferred start</label>
-                  <select id="start" name="start" required>
-                    <option value="" disabled selected>Select</option>
-                    <option>Within 7 days</option>
-                    <option>2–3 weeks</option>
-                    <option>Next month</option>
+                  <label for="b_start">Select start time</label>
+                  <select id="b_start" name="start_hour" required>
+                    <option value="" disabled selected>Select start time</option>
                   </select>
+                  
+                  <div id="slotInfo" style="font-size:12px;opacity:.7;margin-top:6px;">
+Available slots will load after you select a date & service
+                  </div>
+                  <div id="slotGrid" style="margin-top:12px; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px;"></div>
+
+<style>
+  .slot-btn{
+    border-radius:14px;
+    padding:12px 10px;
+    text-align:center;
+    font-weight:800;
+    font-size:13px;
+    border:1px solid rgba(255,255,255,.10);
+    background:rgba(255,255,255,.06);
+    color:rgba(255,255,255,.92);
+    cursor:pointer;
+    transition:transform .12s ease, background .2s ease, opacity .2s ease, border-color .2s ease;
+  }
+  .slot-btn:hover{transform:translateY(-1px); background:rgba(255,255,255,.09);}
+  .slot-btn:active{transform:scale(.99);}
+  .slot-btn.booked{
+    cursor:not-allowed;
+    opacity:.45;
+    background:rgba(255,255,255,.04);
+    border-color:rgba(255,255,255,.08);
+    text-decoration:line-through;
+  }
+  .slot-btn.selected{
+    background:rgba(199,167,106,.18);
+    border-color:rgba(199,167,106,.35);
+  }
+</style>
+
+
                 </div>
               </div>
 
@@ -1218,6 +1250,129 @@
       submitBtn.addEventListener("click", bookNow);
     })();
   </script>
+  <script>
+const serviceDurations = {
+  "Essential Detail": 2,
+  "Full Detail": 4,
+  "Showroom Detail": 6,
+  "Maintenance Detail": 1
+};
+
+const OPEN_HOUR = 8;
+const CLOSE_HOUR = 20;
+
+const dateInput = document.getElementById("b_date");
+const serviceInput = document.getElementById("b_service");
+const startSelect = document.getElementById("b_start");
+const slotGrid = document.getElementById("slotGrid");
+const slotInfo = document.getElementById("slotInfo");
+const form = document.getElementById("bookingForm");
+
+function isWeekend(dateStr){
+  const d = new Date(dateStr);
+  const day = d.getDay();
+  return day === 0 || day === 6;
+}
+
+function within30Days(dateStr){
+  const now = new Date();
+  const target = new Date(dateStr);
+  const diff = (target - now)/(1000*60*60*24);
+  return diff >= 0 && diff <= 30;
+}
+
+async function loadAvailability(){
+  const date = dateInput.value;
+  const service = serviceInput.value;
+  if(!date || !service) return;
+
+  if(!isWeekend(date)){
+    slotInfo.innerText = "Bookings only available on weekends.";
+    slotGrid.innerHTML="";
+    return;
+  }
+
+  if(!within30Days(date)){
+    slotInfo.innerText = "Bookings allowed only within next 30 days.";
+    slotGrid.innerHTML="";
+    return;
+  }
+
+  const res = await fetch(`/api/availability?date=${date}`);
+  const data = await res.json();
+  const booked = data.booked || [];
+
+  const duration = serviceDurations[service] || 2;
+
+  slotGrid.innerHTML="";
+  startSelect.innerHTML=`<option value="" disabled selected>Select start time</option>`;
+
+  for(let h=OPEN_HOUR; h<=CLOSE_HOUR-duration; h++){
+    let blocked=false;
+    for(let x=0;x<duration;x++){
+      if(booked.includes(h+x)) blocked=true;
+    }
+
+    const btn=document.createElement("div");
+    btn.className="slot-btn";
+    btn.innerText=formatHour(h);
+
+    if(blocked){
+      btn.classList.add("booked");
+      btn.innerText+= " (Booked)";
+    }else{
+      btn.onclick=()=>{
+        document.querySelectorAll(".slot-btn").forEach(b=>b.classList.remove("selected"));
+        btn.classList.add("selected");
+        startSelect.value=h;
+      };
+
+      const opt=document.createElement("option");
+      opt.value=h;
+      opt.textContent=formatHour(h);
+      startSelect.appendChild(opt);
+    }
+
+    slotGrid.appendChild(btn);
+  }
+
+  slotInfo.innerText=`Service duration: ${duration} hour(s). Select a start time.`;
+}
+
+function formatHour(h){
+  const ampm = h>=12?"PM":"AM";
+  const hr = ((h+11)%12+1);
+  return `${hr}:00 ${ampm}`;
+}
+
+dateInput?.addEventListener("change",loadAvailability);
+serviceInput?.addEventListener("change",loadAvailability);
+
+form?.addEventListener("submit", async (e)=>{
+  e.preventDefault();
+
+  const fd = new FormData(form);
+  const data = Object.fromEntries(fd.entries());
+
+  const res = await fetch("/api/book",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json"},
+    body: JSON.stringify(data)
+  });
+
+  const json = await res.json();
+
+  if(json.ok){
+    alert("Booking confirmed. You'll receive confirmation shortly.");
+    form.reset();
+    slotGrid.innerHTML="";
+  }else{
+    alert(json.error || "Booking failed");
+  }
+});
+</script>
+
 </body>
 </html>
+
 
