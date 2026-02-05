@@ -1,4 +1,4 @@
-export async function onRequestGet({ env, request }) {
+export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
   const date = url.searchParams.get("date");
 
@@ -10,7 +10,7 @@ export async function onRequestGet({ env, request }) {
   }
 
   const { results } = await env.DB.prepare(
-    "SELECT start_hour, end_hour FROM bookings WHERE date = ? AND status = 'active'"
+    "SELECT start_hour, end_hour FROM bookings WHERE date = ? AND status='active'"
   )
     .bind(date)
     .all();
