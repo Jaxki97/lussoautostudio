@@ -3,127 +3,95 @@ function json(data, status = 200) {
     status,
     headers: {
       "content-type": "application/json",
-      "cache-control": "no-store"
+      "access-control-allow-origin": "*",
+      "access-control-allow-methods": "GET,POST,OPTIONS",
+      "access-control-allow-headers": "content-type"
     }
   });
 }
 
-function isWeekend(dateStr) {
-  // dateStr = YYYY-MM-DD
-  const [y, m, d] = dateStr.split("-").map(Number);
-  const dt = new Date(Date.UTC(y, m - 1, d));
-  const day = dt.getUTCDay(); // 0 Sun, 6 Sat
-  return day === 0 || day === 6;
+export async function onRequestOptions() {
+  return json({ ok: true }, 200);
 }
 
-function daysBetweenUTC(a, b) {
-  const ms = 24 * 60 * 60 * 1000;
-  const ua = Date.UTC(a.getUTCFullYear(), a.getUTCMonth(), a.getUTCDate());
-  const ub = Date.UTC(b.getUTCFullYear(), b.getUTCMonth(), b.getUTCDate());
-  return Math.floor((ub - ua) / ms);
-}
-
-function serviceDurationHours(service) {
-  // You can tweak these anytime
-  const s = (service || "").toLowerCase();
-  if (s.includes("full")) return 4;          // Full Detail = 4 hours
-  if (s.includes("interior")) return 3;      // Interior Deep Clean = 3 hours
-  if (s.includes("maintenance")) return 2;   // Maintenance Wash = 2 hours
-  return 3; // default
-}
-
-function normalizePhone(phone) {
-  return (phone || "").replace(/[^\d+]/g, "").slice(0, 20);
-}
-
-function toInt(v) {
-  const n = Number(v);
-  return Number.isFinite(n) ? Math.trunc(n) : NaN;
-}
-
-function overlap(aStart, aEnd, bStart, bEnd) {
-  return aStart < bEnd && bStart < aEnd;
-}
-
-export async function onRequestPost({ env, request }) {
-  let body;
+export async function onRequestPost({ request, env }) {
   try {
-    body = await request.json();
-  } catch {
-    return json({ error: "Invalid JSON" }, 400);
-  }
+    const body = await request.json();
 
-  const date = body.date;              // YYYY-MM-DD
-  const start_hour = toInt(body.start_hour); // 8..18 etc
-  const service = (body.service || "").trim();
+    const date = String(body.date || "");
+    const start_hour = Number(body.start_hour);
+    const duration_hours = Number(body.duration_hours);
 
-  const name = (body.name || "").trim();
-  const phone = normalizePhone(body.phone);
-  const vehicle = (body.vehicle || "").trim();
-  const city = (body.city || "").trim();
-  const notes = (body.notes || "").trim();
+    const service = String(body.service || "");
+    const name = String(body.name || "");
+    const phone = String(body.phone || "");
+    const vehicle = String(body.vehicle || "");
+    const city = String(body.city || "");
+    const notes = String(body.notes || "");
 
-  if (!date || !Number.isInteger(start_hour) || !service || !name || !phone || !vehicle || !city) {
-    return json({ error: "Missing required fields" }, 400);
-  }
-
-  // Weekend only
-  if (!isWeekend(date)) {
-    return json({ error: "Bookings are available on weekends only." }, 400);
-  }
-
-  // Next 30 days only
-  const now = new Date();
-  const [y, m, d] = date.split("-").map(Number);
-  const reqDate = new Date(Date.UTC(y, m - 1, d));
-  const diff = daysBetweenUTC(
-    new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate())),
-    reqDate
-  );
-
-  if (diff < 0 || diff > 30) {
-    return json({ error: "Bookings can only be made within the next 30 days." }, 400);
-  }
-
-  // Business hours (start time only; duration blocks automatically)
-  const duration_hours = serviceDurationHours(service);
-  const end_hour = start_hour + duration_hours;
-
-  // Customize hours here (8am to 8pm)
-  const OPEN_HOUR = 8;
-  const CLOSE_HOUR = 20; // end must be <= 20
-
-  if (start_hour < OPEN_HOUR || end_hour > CLOSE_HOUR) {
-    return json({ error: `Please choose a start time between ${OPEN_HOUR}:00 and ${CLOSE_HOUR - 1}:00.` }, 400);
-  }
-
-  // Prevent double booking by checking overlap for that date
-  const existing = await env.DB.prepare(
-    "SELECT start_hour, end_hour FROM bookings WHERE date = ? AND status = 'active'"
-  )
-    .bind(date)
-    .all();
-
-  for (const row of existing.results || []) {
-    if (overlap(start_hour, end_hour, row.start_hour, row.end_hour)) {
-      return json({ error: "That time is already booked. Please choose another start time." }, 409);
+    if (!date || !Number.isFinite(start_hour) || !Number.isFinite(duration_hours)) {
+      return json({ error: "Missing required fields" }, 400);
     }
+    if (duration_hours < 1 || duration_hours > 8) {
+      return json({ error: "Invalid duration" }, 400);
+    }
+    if (start_hour < 0 || start_hour > 23) {
+      return json({ error: "Invalid start hour" }, 400);
+    }
+
+    const end_hour = start_hour + duration_hours;
+    if (end_hour > 24) {
+      return json({ error: "Booking exceeds day boundary" }, 400);
+    }
+
+    // Only allow weekends
+    const d = new Date(`${date}T00:00:00`);
+    const day = d.getUTCDay(); // 0 Sun ... 6 Sat
+    if (!(day === 0 || day === 6)) {
+      return json({ error: "Only weekend bookings are available" }, 400);
+    }
+
+    // Check overlap (double-booking protection)
+    const overlap = await env.DB.prepare(
+      `SELECT COUNT(1) AS c
+       FROM bookings
+       WHERE date = ?
+         AND status = 'active'
+         AND NOT (end_hour <= ? OR start_hour >= ?)`
+    )
+      .bind(date, start_hour, end_hour)
+      .first();
+
+    if (overlap?.c > 0) {
+      return json({ error: "That time is already booked" }, 409);
+    }
+
+    const id = crypto.randomUUID();
+    const created_at = new Date().toISOString();
+
+    await env.DB.prepare(
+      `INSERT INTO bookings
+        (id, date, start_hour, duration_hours, end_hour, service, name, phone, vehicle, city, notes, status, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)`
+    )
+      .bind(
+        id,
+        date,
+        start_hour,
+        duration_hours,
+        end_hour,
+        service,
+        name,
+        phone,
+        vehicle,
+        city,
+        notes,
+        created_at
+      )
+      .run();
+
+    return json({ ok: true, id });
+  } catch (e) {
+    return json({ error: "Server error", details: String(e?.message || e) }, 500);
   }
-
-  // Create booking
-  const id = crypto.randomUUID();
-  const created_at = new Date().toISOString();
-
-  await env.DB.prepare(
-    `INSERT INTO bookings
-      (id, date, start_hour, duration_hours, end_hour, service, name, phone, vehicle, city, notes, status, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)`
-  )
-    .bind(id, date, start_hour, duration_hours, end_hour, service, name, phone, vehicle, city, notes || null, created_at)
-    .run();
-
-  return json({
-    ok: true,
-    booking: { id, date, start_hour, end_hour, duration_hours, service }
-  });
 }
