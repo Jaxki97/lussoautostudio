@@ -8,12 +8,10 @@
   <meta name="description" content="Luxury-level, appointment-only mobile auto detailing in Kitchener–Waterloo–Cambridge. Membership available by request." />
   <meta name="theme-color" content="#0b0b0c" />
 
-  <!-- Optional luxury font (safe + fast; site still looks premium without it) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
 
-  <!-- Local SEO Schema (update phone/url/social later) -->
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -50,7 +48,7 @@
       --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.70);
       --muted2:rgba(255,255,255,.55);
-      --gold:#c7a76a;     /* muted brass */
+      --gold:#c7a76a;
       --gold2:#b89455;
       --shadow:0 14px 50px rgba(0,0,0,.55);
       --shadow2:0 22px 80px rgba(0,0,0,.65);
@@ -70,7 +68,6 @@
       overflow-x:hidden;
     }
 
-    /* Subtle premium background */
     .bg-glow{
       position:fixed; inset:0; pointer-events:none; z-index:0;
       background:
@@ -78,7 +75,6 @@
         radial-gradient(600px circle at 110% 85%, rgba(255,255,255,.06), rgba(11,11,12,0) 60%);
     }
 
-    /* Cursor glow - desktop only */
     .cursor-glow{
       position:fixed; inset:0; pointer-events:none; z-index:1;
       opacity:0;
@@ -157,7 +153,6 @@
     .btn-ghost:hover{background:rgba(255,255,255,.10)}
     .btn-sm{padding:10px 14px; font-size:13px}
 
-    /* Hero */
     section{position:relative; z-index:2}
     .hero{padding:36px 0 28px}
     @media(min-width:780px){ .hero{padding:56px 0 40px} }
@@ -258,7 +253,6 @@
 
     .divider{height:1px; background:rgba(255,255,255,.06); margin:18px 0}
 
-    /* Sections */
     .section{padding:34px 0}
     @media(min-width:780px){ .section{padding:54px 0} }
     .section-top{display:flex; flex-direction:column; gap:10px; max-width: 72ch}
@@ -281,7 +275,6 @@
     .cards3{display:grid; gap:12px; margin-top:18px}
     @media(min-width:860px){ .cards3{grid-template-columns: repeat(3, minmax(0,1fr)); gap:14px} }
 
-    /* --- Services tiles: match premium "tile" interaction --- */
     .mini{
       border-radius:var(--radius);
       background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
@@ -328,7 +321,6 @@
     .price-row b{color:var(--text)}
     .mini-link{display:block; text-decoration:none; color:inherit;}
 
-    /* Membership block */
     .membership{margin-top:18px; display:grid; gap:12px;}
     @media(min-width:980px){ .membership{grid-template-columns: 1.1fr .9fr; gap:14px} }
 
@@ -345,7 +337,6 @@
     .lux ul{margin:14px 0 0; padding-left:18px; color:var(--muted); line-height:1.75}
     .lux small{display:block; margin-top:12px; color:var(--muted2); line-height:1.5}
 
-    /* Results grid */
     .gallery{display:grid; gap:12px; margin-top:18px}
     @media(min-width:860px){ .gallery{grid-template-columns:repeat(3, minmax(0,1fr)); gap:14px} }
     .shot{
@@ -359,7 +350,6 @@
     .shot img{width:100%; height:auto; display:block; aspect-ratio: 4 / 3; object-fit:cover}
     .shot div{padding:12px; color:var(--muted); font-size:14px}
 
-    /* Forms */
     form{margin-top:10px}
     label{display:block; font-size:13px; color:var(--muted); margin-top:12px}
     input, select, textarea{
@@ -381,7 +371,6 @@
     .two{display:grid; gap:10px}
     @media(min-width:640px){ .two{grid-template-columns:repeat(2, minmax(0,1fr))} }
 
-    /* Booking layout */
     .book-wrap{margin-top:18px; display:grid; gap:14px;}
     @media(min-width:980px){ .book-wrap{grid-template-columns: .95fr 1.05fr;} }
 
@@ -392,7 +381,6 @@
       padding:18px;
     }
 
-    /* Premium booking card (left) */
     .panel-premium{
       border-radius:var(--radius);
       background:
@@ -440,7 +428,6 @@
       box-shadow:0 0 0 4px rgba(199,167,106,.14);
     }
 
-    /* Trust chips */
     .trust{
       margin-top:12px;
       display:flex;
@@ -458,7 +445,6 @@
       padding:8px 10px;
     }
 
-    /* Better submit */
     .submit-row{
       margin-top:14px;
       display:flex;
@@ -473,30 +459,48 @@
       line-height:1.4;
     }
 
-    /* ===== Booking time slots (Lusso aesthetic) ===== */
+    /* ===== Slot grid ===== */
     .slots{
       margin-top:10px;
       display:grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      /* 2 columns on mobile so the wider range label fits */
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap:10px;
+    }
+    @media(min-width:480px){
+      .slots{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
     @media(min-width:640px){
       .slots{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
     }
+
     .slot{
       border-radius:16px;
-      padding:12px 10px;
+      padding:11px 8px;
       text-align:center;
-      font-weight:750;
-      font-size:13px;
-      color:var(--text);
+      cursor:pointer;
       background:rgba(255,255,255,.05);
       box-shadow:0 0 0 1px rgba(255,255,255,.07) inset;
       transition:transform .16s ease, background .2s ease, box-shadow .2s ease, opacity .2s ease;
       user-select:none;
-      cursor:pointer;
       position:relative;
       overflow:hidden;
+    }
+    /* Start time — prominent */
+    .slot-start{
+      display:block;
+      font-weight:750;
+      font-size:13px;
+      color:var(--text);
+      line-height:1.2;
+    }
+    /* End time — subtle */
+    .slot-end{
+      display:block;
+      font-size:11px;
+      color:var(--muted2);
+      margin-top:3px;
+      line-height:1;
     }
     .slot:hover{
       transform:translateY(-1px);
@@ -507,21 +511,20 @@
       background:rgba(199,167,106,.16);
       box-shadow:0 0 0 1px rgba(199,167,106,.42) inset, var(--shadow);
     }
+    .slot.selected .slot-end{ color:var(--gold); }
     .slot.booked{
       cursor:not-allowed;
-      opacity:.42;
+      opacity:.38;
       transform:none !important;
-      background:rgba(255,255,255,.035);
-      box-shadow:0 0 0 1px rgba(255,255,255,.06) inset;
+      background:rgba(255,255,255,.03);
+      box-shadow:0 0 0 1px rgba(255,255,255,.05) inset;
     }
-    .slot.booked:after{
-      content:"Booked";
-      position:absolute;
-      top:8px; right:10px;
+    /* "Booked" label replaces the end time on booked slots */
+    .slot.booked .slot-end{
       font-size:10px;
-      letter-spacing:.18em;
+      letter-spacing:.16em;
       text-transform:uppercase;
-      color:rgba(255,255,255,.60);
+      color:rgba(255,255,255,.45);
     }
 
     footer{
@@ -536,7 +539,6 @@
     .foot-links a{color:var(--muted2); text-decoration:none}
     .foot-links a:hover{color:var(--text)}
 
-    /* Mobile bar */
     .bar{
       position:fixed; left:0; right:0; bottom:0; z-index:60;
       background:rgba(11,11,12,.82);
@@ -629,7 +631,7 @@
               <div class="kicker">Signature standard</div>
               <div class="card-title">Maintenance that stays immaculate</div>
               <p class="card-text">
-                Biweekly visits. Subtle, consistent care. Your vehicle always looks “ready.”
+                Biweekly visits. Subtle, consistent care. Your vehicle always looks "ready."
               </p>
 
               <div class="divider"></div>
@@ -717,7 +719,7 @@
           </div>
 
           <div class="panel">
-            <div class="eyebrow" style="margin-bottom:8px">Who it’s for</div>
+            <div class="eyebrow" style="margin-bottom:8px">Who it's for</div>
             <h3 style="margin:0; font-family:'Cormorant Garamond',serif; font-size:24px; letter-spacing:.01em;">Designed for premium households</h3>
             <p style="margin:10px 0 0; color:var(--muted); line-height:1.65;">
               This membership is built for clients who value time, consistency, and a refined finish — not bargain pricing.
@@ -725,7 +727,7 @@
             <div class="divider"></div>
             <p style="margin:0; color:var(--muted); line-height:1.65;">
               <b style="color:var(--text)">Ideal:</b> detached homes, private parking, luxury & performance vehicles, busy professionals.<br>
-              <b style="color:var(--text)">Not ideal:</b> no parking access, heavy pet hair every visit, “cheapest price” shoppers.
+              <b style="color:var(--text)">Not ideal:</b> no parking access, heavy pet hair every visit, "cheapest price" shoppers.
             </p>
           </div>
         </div>
@@ -855,12 +857,12 @@
               </div>
 
               <p style="margin:12px 0 0; color:var(--muted2); line-height:1.6; font-size:13px;">
-                Your booking is reserved immediately after confirmation. If a slot is taken while you’re selecting, it will update live.
+                Your booking is reserved immediately after confirmation. If a slot is taken while you're selecting, it will update live.
               </p>
             </div>
           </div>
 
-          <!-- Right: Membership application (clean, no slot UI here) -->
+          <!-- Right: Membership application -->
           <div id="apply" class="panel" style="box-shadow:0 0 0 1px var(--line2) inset, var(--shadow); background:var(--bg2);">
             <div class="form-top">
               <div>
@@ -869,7 +871,7 @@
                   Membership application
                 </h3>
                 <p class="form-note">
-                  Share a few details — we’ll confirm fit and availability within 24 hours.
+                  Share a few details — we'll confirm fit and availability within 24 hours.
                 </p>
               </div>
 
@@ -934,7 +936,7 @@
                 <a class="btn btn-gold" href="javascript:void(0)" id="submitBtn" role="button" aria-label="Submit membership request">
                   Submit Request →
                 </a>
-                <div class="helper">We’ll text you to confirm next steps.</div>
+                <div class="helper">We'll text you to confirm next steps.</div>
               </div>
 
               <p style="margin:12px 0 0; color:var(--muted2); font-size:12px; line-height:1.5;">
@@ -966,7 +968,6 @@
       </div>
     </footer>
 
-    <!-- Mobile bar -->
     <div class="bar" aria-label="Mobile quick actions">
       <a href="#services">Services</a>
       <a href="#book">Book</a>
@@ -975,10 +976,10 @@
   </main>
 
   <script>
-    // Year
+    // ── Year ──────────────────────────────────────────────────────────────────
     document.getElementById("year").textContent = new Date().getFullYear();
 
-    // Bulletproof in-page link scrolling (Safari-safe)
+    // ── Smooth scroll (Safari-safe) ───────────────────────────────────────────
     document.addEventListener("click", function(e){
       var a = e.target.closest && e.target.closest('a[href^="#"]');
       if(!a) return;
@@ -991,20 +992,18 @@
       history.pushState(null, "", id);
     }, {passive:false});
 
-    // Cursor glow (desktop)
+    // ── Cursor glow (desktop only) ────────────────────────────────────────────
     (function(){
       var glow = document.getElementById("cursorGlow");
       if(!glow) return;
       var canHover = window.matchMedia("(hover:hover) and (pointer:fine)").matches;
       if(!canHover) return;
-
       var targetX = 0.5, targetY = 0.25;
       var currentX = 0.5, currentY = 0.25;
       var raf = null;
-
       function setVars(x,y){
-        glow.style.setProperty("--x", (x*100).toFixed(2) + "%");
-        glow.style.setProperty("--y", (y*100).toFixed(2) + "%");
+        glow.style.setProperty("--x", (x*100).toFixed(2)+"%");
+        glow.style.setProperty("--y", (y*100).toFixed(2)+"%");
       }
       function tick(){
         var ease = 0.085;
@@ -1020,213 +1019,233 @@
       }, {passive:true});
     })();
 
-    // Membership submit (Safari friendly)
+    // ── Membership form submit ────────────────────────────────────────────────
     document.getElementById("submitBtn").addEventListener("click", function(){
       document.getElementById("realSubmit").click();
     });
 
-    // =========================
-    // FINAL BOOKING (uses /api/slots + /api/book)
-    // =========================
+    // =========================================================================
+    // BOOKING WIDGET
+    // Relies entirely on the backend for labels, validation, and business rules.
+    // The frontend does ZERO date math — it just renders what the API returns.
+    // =========================================================================
     (function(){
-      const serviceDurations = {
+
+      // Service → duration map (used only for the hint text; backend validates)
+      const SERVICE_DURATIONS = {
         "Interior Deep Clean": 2,
-        "Full Detail": 4,
-        "Maintenance Wash": 1
+        "Full Detail":         4,
+        "Maintenance Wash":    1
       };
 
-      const OPEN_HOUR = 8;
-      const CLOSE_HOUR = 20;
+      // Human-readable messages for the `reason` field on empty slot responses
+      const EMPTY_REASONS = {
+        weekday:  "Bookings are available on weekends only (Sat & Sun).",
+        past:     "That date has already passed.",
+        too_far:  "Bookings can only be made up to 30 days in advance."
+      };
 
-      const dateEl = document.getElementById("bk_date");
+      const dateEl    = document.getElementById("bk_date");
       const serviceEl = document.getElementById("bk_service");
-      const slotGrid = document.getElementById("slotGrid");
-      const slotHint = document.getElementById("slotHint");
-      const statusEl = document.getElementById("bk_status");
+      const slotGrid  = document.getElementById("slotGrid");
+      const slotHint  = document.getElementById("slotHint");
+      const statusEl  = document.getElementById("bk_status");
       const submitBtn = document.getElementById("bk_submitBtn");
 
-      let selectedHour = null;
+      let selectedHour = null;  // Integer hour chosen by the user
 
-      function pad2(n){ return (n<10 ? "0" : "") + n; }
+      // ── Helpers ─────────────────────────────────────────────────────────────
 
-      function formatHour(h){
-        const ampm = h >= 12 ? "PM" : "AM";
-        const hr = ((h + 11) % 12) + 1;
-        return `${hr}:00 ${ampm}`;
-      }
+      function pad2(n){ return (n < 10 ? "0" : "") + n; }
 
-      function isWeekend(dateStr){
-        const d = new Date(dateStr + "T00:00:00");
-        const day = d.getDay();
-        return day === 0 || day === 6;
-      }
-
-      function within30Days(dateStr){
-        const now = new Date();
-        const target = new Date(dateStr + "T00:00:00");
-        const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const diff = (target - start) / (1000 * 60 * 60 * 24);
-        return diff >= 0 && diff <= 30;
-      }
+      function setHint(msg){ slotHint.textContent = msg; }
+      function setStatus(msg){ statusEl.textContent = msg; }
 
       function clearSlots(msg){
         slotGrid.innerHTML = "";
         selectedHour = null;
-        if(msg) slotHint.textContent = msg;
+        if(msg) setHint(msg);
       }
 
+      function setLoading(isLoading){
+        submitBtn.style.pointerEvents = isLoading ? "none" : "auto";
+        submitBtn.style.opacity       = isLoading ? ".75"  : "1";
+      }
+
+      // Build one slot button using labels that came from the backend
+      function buildSlotEl(slot){
+        const div = document.createElement("div");
+        div.className = "slot";
+        div.setAttribute("role", "button");
+        div.setAttribute("tabindex", slot.status === "booked" ? "-1" : "0");
+
+        const startSpan = document.createElement("span");
+        startSpan.className = "slot-start";
+        // Use the backend-provided label if present, fallback gracefully
+        startSpan.textContent = slot.label || `${slot.start_hour}:00`;
+
+        const endSpan = document.createElement("span");
+        endSpan.className = "slot-end";
+
+        if(slot.status === "booked"){
+          div.classList.add("booked");
+          div.setAttribute("aria-disabled", "true");
+          endSpan.textContent = "Booked";
+        } else {
+          // Show the end time so the customer knows the full block upfront
+          endSpan.textContent = slot.end_label ? `until ${slot.end_label}` : "";
+
+          div.addEventListener("click",   () => selectSlot(div, slot));
+          div.addEventListener("keydown", e => {
+            if(e.key === "Enter" || e.key === " "){ e.preventDefault(); selectSlot(div, slot); }
+          });
+        }
+
+        div.appendChild(startSpan);
+        div.appendChild(endSpan);
+        return div;
+      }
+
+      function selectSlot(el, slot){
+        slotGrid.querySelectorAll(".slot").forEach(x => x.classList.remove("selected"));
+        el.classList.add("selected");
+        selectedHour = slot.start_hour;
+        // Show the full range in the status bar
+        const range = slot.label && slot.end_label
+          ? `${slot.label} – ${slot.end_label}`
+          : `${slot.start_hour}:00`;
+        setStatus(`Selected: ${range} · tap Confirm to reserve`);
+      }
+
+      // ── Load slots from backend ──────────────────────────────────────────────
       async function loadSlots(){
-        const date = dateEl.value;
+        const date    = dateEl.value;
         const service = serviceEl.value;
 
         if(!date || !service){
-          clearSlots("Select service + date to view availability.");
-          statusEl.textContent = "Live availability • appointment-only";
+          clearSlots("Select service + date to view availability. Booked slots appear grey.");
+          setStatus("Live availability • appointment-only");
           return;
         }
 
-        if(!isWeekend(date)){
-          clearSlots("Bookings are available on weekends only.");
-          statusEl.textContent = "Weekend-only scheduling";
-          return;
-        }
-
-        if(!within30Days(date)){
-          clearSlots("Bookings are available within the next 30 days only.");
-          statusEl.textContent = "30-day window enabled";
-          return;
-        }
-
-        const duration = serviceDurations[service] || 2;
-        statusEl.textContent = "Checking availability…";
-        slotHint.textContent = `Loading slots… (blocks ${duration} hour${duration>1?"s":""})`;
+        const duration = SERVICE_DURATIONS[service] || 2;
+        setStatus("Checking availability…");
+        setHint(`Loading slots… (reserves ${duration} hour${duration > 1 ? "s" : ""})`);
+        slotGrid.innerHTML = "";
+        selectedHour = null;
 
         let res, data;
         try{
-          res = await fetch(`/api/slots?date=${encodeURIComponent(date)}&duration_hours=${duration}`, {
+          res  = await fetch(`/api/slots?date=${encodeURIComponent(date)}&duration_hours=${duration}`, {
             headers: { "Accept": "application/json" }
           });
           data = await res.json();
-        }catch(e){
-          clearSlots("Availability unavailable (network).");
-          statusEl.textContent = "Availability error";
+        } catch(e){
+          clearSlots("Availability unavailable — check your connection and try again.");
+          setStatus("Network error");
           return;
         }
 
         if(!res.ok || !data?.ok){
-          clearSlots(data?.error || "Availability unavailable (API).");
-          statusEl.textContent = "Availability error";
+          clearSlots(data?.error || "Availability unavailable.");
+          setStatus("API error");
           return;
         }
 
         const slots = data.slots || [];
-        slotGrid.innerHTML = "";
-        selectedHour = null;
 
+        // Empty array: backend tells us why via `reason`
         if(slots.length === 0){
-          clearSlots("No available slots for that date.");
-          statusEl.textContent = "No slots";
+          const msg = EMPTY_REASONS[data.reason] || "No available slots for that date.";
+          clearSlots(msg);
+          setStatus(msg);
           return;
         }
 
-        slotHint.textContent = `Select a start time. (blocks ${duration} hour${duration>1?"s":""})`;
-        statusEl.textContent = "Live availability • updated";
+        // Render slots — labels come from the backend, no frontend math needed
+        slots.forEach(slot => slotGrid.appendChild(buildSlotEl(slot)));
 
-        slots.forEach(s => {
-          const div = document.createElement("div");
-          div.className = "slot";
-          div.textContent = formatHour(s.start_hour);
-
-          if(s.status === "booked"){
-            div.classList.add("booked");
-          } else {
-            div.addEventListener("click", () => {
-              slotGrid.querySelectorAll(".slot").forEach(x => x.classList.remove("selected"));
-              div.classList.add("selected");
-              selectedHour = s.start_hour;
-              statusEl.textContent = `Selected: ${formatHour(selectedHour)} • tap Confirm`;
-            });
-          }
-
-          slotGrid.appendChild(div);
-        });
+        const available = slots.filter(s => s.status === "available").length;
+        setHint(
+          available > 0
+            ? `${available} slot${available > 1 ? "s" : ""} available · each block reserves ${duration} hr${duration > 1 ? "s" : ""}`
+            : "All slots are booked for this date."
+        );
+        setStatus("Live availability • updated");
       }
 
+      // ── Submit booking ───────────────────────────────────────────────────────
       async function bookNow(){
-        const name = document.getElementById("bk_name").value.trim();
-        const phone = document.getElementById("bk_phone").value.trim();
+        const name    = document.getElementById("bk_name").value.trim();
+        const phone   = document.getElementById("bk_phone").value.trim();
         const vehicle = document.getElementById("bk_vehicle").value.trim();
-        const city = document.getElementById("bk_city").value.trim();
+        const city    = document.getElementById("bk_city").value.trim();
         const service = serviceEl.value;
-        const notes = document.getElementById("bk_notes").value.trim();
-        const date = dateEl.value;
+        const notes   = document.getElementById("bk_notes").value.trim();
+        const date    = dateEl.value;
 
         if(!name || !phone || !vehicle || !city || !service || !date){
-          statusEl.textContent = "Please fill all details first.";
+          setStatus("Please fill in all required fields first.");
           return;
         }
         if(selectedHour === null){
-          statusEl.textContent = "Please select a start time.";
+          setStatus("Please select a start time.");
           return;
         }
 
-        const duration = serviceDurations[service] || 2;
+        const duration = SERVICE_DURATIONS[service] || 2;
 
-        submitBtn.style.pointerEvents = "none";
-        submitBtn.style.opacity = ".85";
-        statusEl.textContent = "Placing your booking…";
-
-        const payload = {
-          date,
-          start_hour: selectedHour,
-          duration_hours: duration,
-          service,
-          name,
-          phone,
-          vehicle,
-          city,
-          notes
-        };
+        setLoading(true);
+        setStatus("Placing your booking…");
 
         let res, out;
         try{
           res = await fetch("/api/book", {
-            method: "POST",
+            method:  "POST",
             headers: { "Content-Type": "application/json", "Accept": "application/json" },
-            body: JSON.stringify(payload)
+            body:    JSON.stringify({
+              date,
+              start_hour:     selectedHour,
+              duration_hours: duration,
+              service,
+              name,
+              phone,
+              vehicle,
+              city,
+              notes
+            })
           });
-          out = await res.json().catch(()=> ({}));
-        }catch(e){
-          statusEl.textContent = "Booking failed (network). Try again.";
-          submitBtn.style.pointerEvents = "auto";
-          submitBtn.style.opacity = "1";
+          out = await res.json().catch(() => ({}));
+        } catch(e){
+          setStatus("Booking failed (network error). Please try again.");
+          setLoading(false);
           return;
         }
 
         if(res.status === 409){
-          statusEl.textContent = "That slot was just booked. Please choose another.";
-          await loadSlots();
+          // Race condition — someone else grabbed the slot
+          setStatus("That slot was just taken. Please choose another time.");
+          await loadSlots();  // Refresh the grid immediately
         } else if(!res.ok){
-          statusEl.textContent = out?.error || "Booking failed. Try again.";
+          setStatus(out?.error || "Booking failed. Please try again.");
         } else {
-          statusEl.textContent = "Confirmed. You’re booked — we’ll text you shortly.";
-          await loadSlots();
+          setStatus("Confirmed ✓ — you're booked. We'll text you shortly.");
+          await loadSlots();  // Refresh so the newly-booked slot shows as taken
         }
 
-        submitBtn.style.pointerEvents = "auto";
-        submitBtn.style.opacity = "1";
+        setLoading(false);
       }
 
-      // Set min date = today
+      // ── Init ─────────────────────────────────────────────────────────────────
+
+      // Set min date to today so the date picker won't allow past dates
       const now = new Date();
       dateEl.min = `${now.getFullYear()}-${pad2(now.getMonth()+1)}-${pad2(now.getDate())}`;
 
-      // Events
-      dateEl.addEventListener("change", loadSlots);
+      dateEl.addEventListener("change",  loadSlots);
       serviceEl.addEventListener("change", loadSlots);
-      submitBtn.addEventListener("click", bookNow);
+      submitBtn.addEventListener("click",  bookNow);
 
-      // Initial state
       clearSlots("Select service + date to view availability. Booked slots appear grey.");
     })();
   </script>
