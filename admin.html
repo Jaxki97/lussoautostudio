@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lusso Admin — Bookings</title>
+  <meta name="robots" content="noindex,nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:     #09090b;
+      --bg2:    #0f0f12;
+      --bg3:    #141418;
+      --line:   rgba(255,255,255,.07);
+      --line2:  rgba(199,167,106,.20);
+      --text:   rgba(255,255,255,.92);
+      --muted:  rgba(255,255,255,.55);
+      --muted2: rgba(255,255,255,.30);
+      --gold:   #c7a76a;
+      --gold2:  #a8894e;
+      --green:  #4ade80;
+      --red:    #f87171;
+      --radius: 18px;
+      --mono:   "DM Mono", monospace;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+
+    /* ── Login screen ─────────────────────────────────────────────────────── */
+    #loginScreen {
+      position: fixed; inset: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--bg);
+    }
+    .login-box {
+      width: min(380px, 92vw);
+      padding: 36px;
+      border-radius: 24px;
+      background: var(--bg2);
+      box-shadow: 0 0 0 1px var(--line2), 0 32px 80px rgba(0,0,0,.6);
+      text-align: center;
+    }
+    .login-logo {
+      width: 52px; height: 52px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow: 0 0 0 1px var(--line2) inset;
+      display: grid; place-items: center;
+      margin: 0 auto 18px;
+    }
+    .login-logo span {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 26px; color: var(--gold);
+    }
+    .login-box h1 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 26px; letter-spacing: .02em;
+      margin-bottom: 6px;
+    }
+    .login-box p { color: var(--muted); font-size: 13px; margin-bottom: 24px; }
+    .login-box input {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 15px;
+      letter-spacing: .08em;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+      text-align: center;
+    }
+    .login-box input:focus {
+      border-color: rgba(199,167,106,.45);
+      box-shadow: 0 0 0 3px rgba(199,167,106,.12);
+    }
+    .login-btn {
+      width: 100%;
+      margin-top: 12px;
+      padding: 13px;
+      border-radius: 14px;
+      border: none;
+      background: var(--gold);
+      color: #09090b;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      cursor: pointer;
+      transition: opacity .15s;
+    }
+    .login-btn:hover { opacity: .88; }
+    .login-err {
+      margin-top: 10px;
+      color: var(--red);
+      font-size: 13px;
+      min-height: 18px;
+    }
+
+    /* ── Main layout ──────────────────────────────────────────────────────── */
+    #app { display: none; }
+
+    header {
+      position: sticky; top: 0; z-index: 40;
+      border-bottom: 1px solid var(--line);
+      background: rgba(9,9,11,.82);
+      backdrop-filter: blur(12px);
+      padding: 0 24px;
+    }
+    .hrow {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 16px; height: 58px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .hlogo {
+      width: 34px; height: 34px; border-radius: 999px;
+      display: grid; place-items: center;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow: 0 0 0 1px var(--line2) inset;
+      flex-shrink: 0;
+    }
+    .hlogo span { font-family: "Cormorant Garamond", serif; font-size: 18px; color: var(--gold); }
+    .brand-name { font-family: "Cormorant Garamond", serif; font-size: 17px; letter-spacing: .02em; }
+    .brand-tag { font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted2); margin-top: 1px; }
+
+    .header-right { display: flex; align-items: center; gap: 12px; }
+    .refresh-btn {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .refresh-btn:hover { background: rgba(255,255,255,.08); color: var(--text); }
+    .logout-btn {
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(199,167,106,.18);
+      background: transparent;
+      color: var(--muted);
+      font-size: 12px;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+    }
+    .logout-btn:hover { background: rgba(199,167,106,.08); color: var(--gold); }
+
+    /* ── Page body ────────────────────────────────────────────────────────── */
+    .wrap { max-width: 1200px; margin: 0 auto; padding: 28px 24px 80px; }
+
+    /* ── Stats row ────────────────────────────────────────────────────────── */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    @media(min-width: 640px) { .stats { grid-template-columns: repeat(4, 1fr); } }
+
+    .stat-card {
+      border-radius: var(--radius);
+      padding: 16px;
+      background: var(--bg2);
+      box-shadow: 0 0 0 1px var(--line);
+      transition: box-shadow .2s;
+    }
+    .stat-card:hover { box-shadow: 0 0 0 1px var(--line2); }
+    .stat-label {
+      font-size: 11px; letter-spacing: .22em; text-transform: uppercase;
+      color: var(--muted2);
+    }
+    .stat-val {
+      font-family: var(--mono);
+      font-size: 28px; font-weight: 500;
+      color: var(--text);
+      margin-top: 8px; line-height: 1;
+    }
+    .stat-val.gold { color: var(--gold); }
+    .stat-sub { font-size: 12px; color: var(--muted); margin-top: 6px; }
+
+    /* ── Filters ──────────────────────────────────────────────────────────── */
+    .filters {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .filters select, .filters input[type="date"] {
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: var(--bg2);
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+      transition: border-color .2s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+    .filters select:focus, .filters input[type="date"]:focus {
+      border-color: rgba(199,167,106,.35);
+    }
+    .filter-count {
+      margin-left: auto;
+      font-size: 12px; color: var(--muted2);
+      font-family: var(--mono);
+    }
+
+    /* ── Table ────────────────────────────────────────────────────────────── */
+    .table-wrap {
+      border-radius: var(--radius);
+      border: 1px solid var(--line);
+      overflow: hidden;
+      background: var(--bg2);
+    }
+    table { width: 100%; border-collapse: collapse; }
+    thead tr {
+      border-bottom: 1px solid var(--line);
+      background: var(--bg3);
+    }
+    th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 11px;
+      letter-spacing: .20em;
+      text-transform: uppercase;
+      color: var(--muted2);
+      font-weight: 500;
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--line);
+      transition: background .15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,.025); }
+    td {
+      padding: 14px 16px;
+      font-size: 13px;
+      color: var(--text);
+      vertical-align: middle;
+    }
+
+    .td-date {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+    .td-time {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .td-name { font-weight: 600; }
+    .td-phone {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .td-vehicle { color: var(--muted); font-size: 12px; }
+    .td-notes {
+      color: var(--muted2);
+      font-size: 12px;
+      max-width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .04em;
+      white-space: nowrap;
+    }
+    .badge-dot { width: 5px; height: 5px; border-radius: 99px; }
+    .badge-active {
+      background: rgba(74,222,128,.10);
+      color: var(--green);
+      border: 1px solid rgba(74,222,128,.18);
+    }
+    .badge-active .badge-dot { background: var(--green); }
+    .badge-service {
+      background: rgba(199,167,106,.10);
+      color: var(--gold);
+      border: 1px solid rgba(199,167,106,.18);
+    }
+
+    .cancel-btn {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(248,113,113,.18);
+      background: transparent;
+      color: rgba(248,113,113,.70);
+      font-size: 11px;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+      white-space: nowrap;
+    }
+    .cancel-btn:hover {
+      background: rgba(248,113,113,.10);
+      color: var(--red);
+    }
+
+    /* ── Empty / loading states ───────────────────────────────────────────── */
+    .state-row td {
+      text-align: center;
+      padding: 48px 16px;
+      color: var(--muted2);
+    }
+    .state-row .state-icon {
+      font-size: 32px;
+      display: block;
+      margin-bottom: 10px;
+    }
+    .state-row .state-msg { font-size: 14px; }
+
+    /* ── Today banner ─────────────────────────────────────────────────────── */
+    .today-banner {
+      display: flex; align-items: center; gap: 12px;
+      padding: 14px 18px;
+      border-radius: var(--radius);
+      background: linear-gradient(135deg, rgba(199,167,106,.10), rgba(199,167,106,.04));
+      border: 1px solid rgba(199,167,106,.18);
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .today-banner b { color: var(--text); }
+    .today-dot { width: 8px; height: 8px; border-radius: 99px; background: var(--gold); flex-shrink:0; box-shadow: 0 0 0 3px rgba(199,167,106,.15); }
+
+    /* ── Responsive table scroll ──────────────────────────────────────────── */
+    .table-scroll { overflow-x: auto; }
+
+    /* ── Section heading ──────────────────────────────────────────────────── */
+    .section-head {
+      display: flex; align-items: baseline; gap: 10px;
+      margin-bottom: 14px;
+    }
+    .section-head h2 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 22px; letter-spacing: .01em;
+    }
+    .section-head span { font-size: 12px; color: var(--muted2); font-family: var(--mono); }
+  </style>
+</head>
+<body>
+
+<!-- ── Login ────────────────────────────────────────────────────────────── -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo"><span>L</span></div>
+    <h1>Lusso Admin</h1>
+    <p>Enter your admin password to continue</p>
+    <input id="pwInput" type="password" placeholder="••••••••" autocomplete="current-password" />
+    <button class="login-btn" id="loginBtn">Unlock Dashboard</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- ── App ──────────────────────────────────────────────────────────────── -->
+<div id="app">
+  <header>
+    <div class="hrow">
+      <div class="brand">
+        <div class="hlogo"><span>L</span></div>
+        <div>
+          <div class="brand-name">Lusso Auto Studio</div>
+          <div class="brand-tag">Owner Dashboard</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="refresh-btn" id="refreshBtn">↻ Refresh</button>
+        <button class="logout-btn" id="logoutBtn">Lock</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+
+    <!-- Stats -->
+    <div class="stats" id="statsRow">
+      <div class="stat-card">
+        <div class="stat-label">Total Bookings</div>
+        <div class="stat-val gold" id="statTotal">—</div>
+        <div class="stat-sub">All time</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">This Weekend</div>
+        <div class="stat-val" id="statWeekend">—</div>
+        <div class="stat-sub">Upcoming</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">This Month</div>
+        <div class="stat-val" id="statMonth">—</div>
+        <div class="stat-sub">Active bookings</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Next Booking</div>
+        <div class="stat-val" id="statNext" style="font-size:16px; margin-top:10px;">—</div>
+        <div class="stat-sub" id="statNextSub"></div>
+      </div>
+    </div>
+
+    <!-- Today banner (shown only if there's a booking today) -->
+    <div class="today-banner" id="todayBanner" style="display:none">
+      <span class="today-dot"></span>
+      <span id="todayText"></span>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <select id="filterStatus">
+        <option value="all">All statuses</option>
+        <option value="active" selected>Active only</option>
+      </select>
+      <select id="filterService">
+        <option value="all">All services</option>
+        <option value="Maintenance Wash">Maintenance Wash</option>
+        <option value="Interior Deep Clean">Interior Deep Clean</option>
+        <option value="Full Detail">Full Detail</option>
+      </select>
+      <input type="date" id="filterDate" title="Filter by date" />
+      <button class="refresh-btn" id="clearFilter" style="border-color:rgba(199,167,106,.18); color:var(--muted);">✕ Clear</button>
+      <span class="filter-count" id="filterCount"></span>
+    </div>
+
+    <!-- Table -->
+    <div class="section-head">
+      <h2>Bookings</h2>
+      <span id="tableSubtitle"></span>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Time</th>
+              <th>Client</th>
+              <th>Phone</th>
+              <th>Vehicle</th>
+              <th>City</th>
+              <th>Service</th>
+              <th>Notes</th>
+              <th>Status</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="bookingsTbody">
+            <tr class="state-row">
+              <td colspan="10">
+                <span class="state-icon">⏳</span>
+                <span class="state-msg">Loading bookings…</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ── Config ───────────────────────────────────────────────────────────────────
+// Change this password to whatever you want. For production, move auth to
+// /api/admin/bookings so the password is never in the HTML file.
+const ADMIN_PASSWORD = "Jaxki@6358";
+const SESSION_KEY    = "lusso_admin_authed";
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
+function isAuthed() {
+  return sessionStorage.getItem(SESSION_KEY) === "1";
+}
+function unlock() {
+  sessionStorage.setItem(SESSION_KEY, "1");
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  loadBookings();
+}
+function lock() {
+  sessionStorage.removeItem(SESSION_KEY);
+  document.getElementById("loginScreen").style.display = "flex";
+  document.getElementById("app").style.display = "none";
+  document.getElementById("pwInput").value = "";
+}
+
+document.getElementById("loginBtn").addEventListener("click", tryLogin);
+document.getElementById("pwInput").addEventListener("keydown", e => {
+  if (e.key === "Enter") tryLogin();
+});
+function tryLogin() {
+  const val = document.getElementById("pwInput").value;
+  if (val === ADMIN_PASSWORD) {
+    unlock();
+  } else {
+    const errEl = document.getElementById("loginErr");
+    errEl.textContent = "Incorrect password.";
+    document.getElementById("pwInput").value = "";
+    setTimeout(() => errEl.textContent = "", 2500);
+  }
+}
+document.getElementById("logoutBtn").addEventListener("click", lock);
+
+if (isAuthed()) unlock();
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function formatHour(h) {
+  const period = h >= 12 ? "PM" : "AM";
+  const hr = ((h + 11) % 12) + 1;
+  return `${hr}:00 ${period}`;
+}
+function formatDate(dateStr) {
+  // dateStr is YYYY-MM-DD
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const names = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const days  = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  const dow   = new Date(y, m-1, d).getDay();
+  return `${days[dow]}, ${names[m-1]} ${d}`;
+}
+function todayStr() {
+  const n = new Date();
+  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,"0")}-${String(n.getDate()).padStart(2,"0")}`;
+}
+function nextWeekendDates() {
+  const today = new Date(); today.setHours(0,0,0,0);
+  const results = [];
+  for (let i = 0; i <= 7; i++) {
+    const d = new Date(today); d.setDate(today.getDate() + i);
+    if (d.getDay() === 0 || d.getDay() === 6) {
+      const s = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+      results.push(s);
+      if (results.length === 2) break;
+    }
+  }
+  return results;
+}
+
+// ── Data ──────────────────────────────────────────────────────────────────────
+let allBookings = [];
+
+async function loadBookings() {
+  const tbody = document.getElementById("bookingsTbody");
+  tbody.innerHTML = `<tr class="state-row"><td colspan="10"><span class="state-icon">⏳</span><span class="state-msg">Loading…</span></td></tr>`;
+
+  let res, data;
+  try {
+    res  = await fetch("/api/admin/bookings", { headers: { "Accept": "application/json" } });
+    data = await res.json();
+  } catch(e) {
+    tbody.innerHTML = `<tr class="state-row"><td colspan="10"><span class="state-icon">⚠️</span><span class="state-msg">Could not reach the API. Is your backend deployed?</span></td></tr>`;
+    return;
+  }
+
+  if (!res.ok || !data?.ok) {
+    tbody.innerHTML = `<tr class="state-row"><td colspan="10"><span class="state-icon">⚠️</span><span class="state-msg">${data?.error || "API error"}</span></td></tr>`;
+    return;
+  }
+
+  allBookings = data.bookings || [];
+  updateStats();
+  renderTable();
+}
+
+// ── Stats ─────────────────────────────────────────────────────────────────────
+function updateStats() {
+  const active   = allBookings.filter(b => b.status === "active");
+  const today    = todayStr();
+  const weekends = nextWeekendDates();
+  const monthStr = today.slice(0, 7); // YYYY-MM
+
+  document.getElementById("statTotal").textContent   = active.length;
+  document.getElementById("statWeekend").textContent = active.filter(b => weekends.includes(b.date)).length;
+  document.getElementById("statMonth").textContent   = active.filter(b => b.date.startsWith(monthStr)).length;
+
+  // Next upcoming booking
+  const upcoming = active
+    .filter(b => b.date >= today)
+    .sort((a,b) => a.date.localeCompare(b.date) || a.start_hour - b.start_hour);
+
+  if (upcoming.length) {
+    const nx = upcoming[0];
+    document.getElementById("statNext").textContent    = formatDate(nx.date);
+    document.getElementById("statNextSub").textContent = `${formatHour(nx.start_hour)} · ${nx.service}`;
+  } else {
+    document.getElementById("statNext").textContent    = "None";
+    document.getElementById("statNextSub").textContent = "No upcoming bookings";
+  }
+
+  // Today banner
+  const todayBookings = active.filter(b => b.date === today);
+  const banner = document.getElementById("todayBanner");
+  if (todayBookings.length) {
+    banner.style.display = "flex";
+    const names = todayBookings.map(b => `${b.name} at ${formatHour(b.start_hour)}`).join(" · ");
+    document.getElementById("todayText").innerHTML = `<b>Today:</b> ${todayBookings.length} booking${todayBookings.length > 1 ? "s" : ""} — ${names}`;
+  } else {
+    banner.style.display = "none";
+  }
+}
+
+// ── Render table ──────────────────────────────────────────────────────────────
+function renderTable() {
+  const statusFilter  = document.getElementById("filterStatus").value;
+  const serviceFilter = document.getElementById("filterService").value;
+  const dateFilter    = document.getElementById("filterDate").value;
+
+  let filtered = allBookings.filter(b => {
+    if (statusFilter  !== "all" && b.status  !== statusFilter)  return false;
+    if (serviceFilter !== "all" && b.service !== serviceFilter) return false;
+    if (dateFilter    && b.date !== dateFilter)                 return false;
+    return true;
+  });
+
+  // Sort: upcoming first, then past; within same date sort by start_hour
+  const today = todayStr();
+  filtered.sort((a, b) => {
+    const aFuture = a.date >= today ? 0 : 1;
+    const bFuture = b.date >= today ? 0 : 1;
+    if (aFuture !== bFuture) return aFuture - bFuture;
+    return a.date.localeCompare(b.date) || a.start_hour - b.start_hour;
+  });
+
+  document.getElementById("filterCount").textContent = `${filtered.length} result${filtered.length !== 1 ? "s" : ""}`;
+  document.getElementById("tableSubtitle").textContent = filtered.length
+    ? `${filtered.length} booking${filtered.length !== 1 ? "s" : ""}`
+    : "";
+
+  const tbody = document.getElementById("bookingsTbody");
+  if (!filtered.length) {
+    tbody.innerHTML = `<tr class="state-row"><td colspan="10"><span class="state-icon">📭</span><span class="state-msg">No bookings match your filters.</span></td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filtered.map(b => {
+    const isPast = b.date < today;
+    const rowStyle = isPast ? 'style="opacity:.55"' : "";
+    return `
+      <tr ${rowStyle}>
+        <td class="td-date">${formatDate(b.date)}<br><span style="color:var(--muted2);font-size:11px">${b.date}</span></td>
+        <td class="td-time">${formatHour(b.start_hour)}<br><span style="color:var(--muted2)">→ ${formatHour(b.end_hour)}</span></td>
+        <td class="td-name">${esc(b.name)}</td>
+        <td class="td-phone"><a href="tel:${esc(b.phone)}" style="color:var(--muted);text-decoration:none;">${esc(b.phone)}</a></td>
+        <td class="td-vehicle">${esc(b.vehicle)}</td>
+        <td style="font-size:12px;color:var(--muted)">${esc(b.city || "—")}</td>
+        <td><span class="badge badge-service">${esc(b.service)}</span></td>
+        <td class="td-notes" title="${esc(b.notes || "")}">${esc(b.notes || "—")}</td>
+        <td><span class="badge badge-active"><span class="badge-dot"></span>${esc(b.status)}</span></td>
+        <td>${b.status === "active" ? `<button class="cancel-btn" onclick="cancelBooking('${b.id}')">Cancel</button>` : ""}</td>
+      </tr>`;
+  }).join("");
+}
+
+function esc(str) {
+  return String(str ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+// ── Cancel booking ─────────────────────────────────────────────────────────
+async function cancelBooking(id) {
+  if (!confirm("Cancel this booking? This cannot be undone.")) return;
+  try {
+    const res  = await fetch("/api/admin/cancel", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json" },
+      body:    JSON.stringify({ id })
+    });
+    const data = await res.json();
+    if (data.ok) {
+      await loadBookings();
+    } else {
+      alert(data.error || "Could not cancel booking.");
+    }
+  } catch(e) {
+    alert("Network error. Try again.");
+  }
+}
+
+// ── Filters ────────────────────────────────────────────────────────────────
+document.getElementById("filterStatus").addEventListener("change",  renderTable);
+document.getElementById("filterService").addEventListener("change", renderTable);
+document.getElementById("filterDate").addEventListener("change",    renderTable);
+document.getElementById("clearFilter").addEventListener("click", () => {
+  document.getElementById("filterStatus").value  = "active";
+  document.getElementById("filterService").value = "all";
+  document.getElementById("filterDate").value    = "";
+  renderTable();
+});
+document.getElementById("refreshBtn").addEventListener("click", loadBookings);
+</script>
+</body>
+</html>
