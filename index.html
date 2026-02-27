@@ -1053,6 +1053,7 @@
       const submitBtn = document.getElementById("bk_submitBtn");
 
       let selectedHour = null;  // Integer hour chosen by the user
+      let loadedSlots   = [];   // Full slot list from last API response
 
       // ── Helpers ─────────────────────────────────────────────────────────────
 
@@ -1110,11 +1111,29 @@
         slotGrid.querySelectorAll(".slot").forEach(x => x.classList.remove("selected"));
         el.classList.add("selected");
         selectedHour = slot.start_hour;
-        // Show the full range in the status bar
-        const range = slot.label && slot.end_label
-          ? `${slot.label} – ${slot.end_label}`
-          : `${slot.start_hour}:00`;
-        setStatus(`Selected: ${range} · tap Confirm to reserve`);
+
+        const service  = serviceEl.value;
+        const duration = SERVICE_DURATIONS[service] || 2;
+
+        // Check if this start time + duration would run into a booked hour.
+        // e.g. selecting 11 AM for a 4hr service when 1 PM is booked → collision at hour 13.
+        const collision = loadedSlots.find(s =>
+          s.status === "booked" &&
+          s.start_hour > slot.start_hour &&
+          s.start_hour < slot.start_hour + duration
+        );
+
+        if(collision){
+          const range = slot.label && collision.label
+            ? `${slot.label} – ${collision.label}`
+            : `${slot.start_hour}:00`;
+          setStatus(`⚠ ${range} available, but runs into a booking at ${collision.label}. Choose an earlier or later time.`);
+        } else {
+          const range = slot.label && slot.end_label
+            ? `${slot.label} – ${slot.end_label}`
+            : `${slot.start_hour}:00`;
+          setStatus(`Selected: ${range} · tap Confirm to reserve`);
+        }
       }
 
       // ── Load slots from backend ──────────────────────────────────────────────
@@ -1161,6 +1180,9 @@
           setStatus(msg);
           return;
         }
+
+        // Store slots so selectSlot can check for collisions
+        loadedSlots = slots;
 
         // Render slots — labels come from the backend, no frontend math needed
         slots.forEach(slot => slotGrid.appendChild(buildSlotEl(slot)));
