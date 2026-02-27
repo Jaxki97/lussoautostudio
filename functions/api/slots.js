@@ -5,13 +5,20 @@
 // GET /api/slots?date=YYYY-MM-DD&duration_hours=4
 //
 // Response:
-//   { ok: true, slots: [{ start_hour, label, end_label, status }] }
+//   { ok: true, slots: [{ start_hour, end_hour, label, end_label, status }] }
 //
-// Architecture: Start-time blocking model.
-//   A candidate slot [start, start+duration) is AVAILABLE if and only if it
-//   does NOT overlap with any existing booking's [start_hour, end_hour).
-//   Two intervals overlap when: start < bEnd && end > bStart
-//   (equivalently, NOT (end <= bStart || start >= bEnd))
+// Architecture: Occupied-hour blocking model.
+//   A start time is BOOKED if that hour falls inside any existing booking's
+//   [start_hour, end_hour) range. This means only the hours that are literally
+//   taken show as grey — regardless of what service the customer is browsing.
+//
+//   Example: Full Detail booked 1–5 PM → hours 1, 2, 3, 4 are grey.
+//            Hour 5 is available. Hours before 1 PM are available.
+//
+//   Note: book.js still enforces true overlap prevention on write, so a
+//   customer cannot book a slot whose duration would run into a booked block.
+//   The frontend should also warn the user if their selected start + duration
+//   would collide (see end_hour in the response for the booked slots).
 // =============================================================================
 
 const CORS_HEADERS = {
@@ -102,31 +109,37 @@ export async function onRequestGet({ request, env }) {
     return json({ ok: false, error: "Database error", details: String(e?.message ?? e) }, 500);
   }
 
-  // ── Core overlap check ──────────────────────────────────────────────────────
-  // Candidate slot  : [candidateStart, candidateEnd)
-  // Existing booking: [bStart,         bEnd)
-  // They overlap when: candidateStart < bEnd  &&  candidateEnd > bStart
-  function wouldOverlap(candidateStart, candidateEnd) {
-    for (const { start_hour: bStart, end_hour: bEnd } of existingBookings) {
-      if (candidateStart < bEnd && candidateEnd > bStart) return true;
+  // ── Build a set of all occupied hours ──────────────────────────────────────
+  // For each existing booking [start_hour, end_hour), mark every integer hour
+  // in that range as occupied. e.g. booking 13–17 → occupies {13,14,15,16}.
+  const occupiedHours = new Set();
+  for (const { start_hour, end_hour } of existingBookings) {
+    for (let h = start_hour; h < end_hour; h++) {
+      occupiedHours.add(h);
     }
-    return false;
   }
 
   // ── Build slot list ─────────────────────────────────────────────────────────
-  // A start time `h` is valid only if the booking would finish by CLOSE_HOUR.
-  // Last valid start = CLOSE_HOUR - duration_hours
+  // Show every hour from OPEN to CLOSE as a potential start time.
+  // A slot is "booked" if that specific hour is occupied by an existing booking.
+  // Slots where the duration would run past closing are excluded silently.
   const slots = [];
-  for (let h = OPEN_HOUR; h <= CLOSE_HOUR - duration_hours; h++) {
+  for (let h = OPEN_HOUR; h < CLOSE_HOUR; h++) {
     const end = h + duration_hours;
-    const blocked = wouldOverlap(h, end);
+    const isOccupied = occupiedHours.has(h);
+    const fitsBeforeClose = end <= CLOSE_HOUR;
+
+    // Drop unselectable free slots at end of day (e.g. 8 PM start for 4hr service)
+    if (!fitsBeforeClose && !isOccupied) continue;
 
     slots.push({
-      start_hour: h,           // Integer — use for API calls
-      end_hour:   end,         // Integer — useful for display
-      label:      formatHour(h),      // e.g. "9:00 AM"
-      end_label:  formatHour(end),    // e.g. "1:00 PM"
-      status:     blocked ? "booked" : "available",
+      start_hour: h,
+      end_hour:   end,
+      label:      formatHour(h),
+      end_label:  formatHour(Math.min(end, CLOSE_HOUR)),
+      // Occupied hours grey out. Hours that don't fit the duration also grey
+      // so the grid looks complete near closing time.
+      status: (isOccupied || !fitsBeforeClose) ? "booked" : "available",
     });
   }
 
