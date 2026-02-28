@@ -22,7 +22,7 @@
 // =============================================================================
 
 const CORS_HEADERS = {
-  "access-control-allow-origin": "*",
+  "access-control-allow-origin": "https://lussoautostudio.ca",
   "access-control-allow-methods": "GET, OPTIONS",
   "access-control-allow-headers": "content-type",
 };
@@ -106,7 +106,8 @@ export async function onRequestGet({ request, env }) {
       .all();
     existingBookings = results; // [{ start_hour, end_hour }, ...]
   } catch (e) {
-    return json({ ok: false, error: "Database error", details: String(e?.message ?? e) }, 500);
+    console.error("[slots] DB error:", e?.message ?? e);
+    return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
   }
 
   // ── Build a set of all occupied hours ──────────────────────────────────────
