@@ -368,6 +368,26 @@
       box-shadow:0 0 0 3px rgba(199,167,106,.15);
     }
     textarea{min-height:120px; resize:vertical}
+
+    /* ── Date input calendar icon ──────────────────────────────────────────── */
+    /* Chrome, Edge, Safari — invert black icon to white, subtle opacity */
+    input[type="date"]::-webkit-calendar-picker-indicator{
+      filter: invert(1) opacity(.55);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      transition: filter .2s ease, background .2s ease;
+    }
+    /* Hover — brighten with warm gold tint */
+    input[type="date"]:hover::-webkit-calendar-picker-indicator{
+      filter: invert(1) opacity(.85) sepia(1) saturate(2) hue-rotate(5deg);
+      background: rgba(199,167,106,.10);
+    }
+    /* Focus — full brightness, gold background hint */
+    input[type="date"]:focus::-webkit-calendar-picker-indicator{
+      filter: invert(1) opacity(1) sepia(1) saturate(2) hue-rotate(5deg);
+      background: rgba(199,167,106,.15);
+    }
     .two{display:grid; gap:10px}
     @media(min-width:640px){ .two{grid-template-columns:repeat(2, minmax(0,1fr))} }
 
