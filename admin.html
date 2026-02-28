@@ -489,7 +489,10 @@
 // ── Config ───────────────────────────────────────────────────────────────────
 // Change this password to whatever you want. For production, move auth to
 // /api/admin/bookings so the password is never in the HTML file.
-const ADMIN_PASSWORD = "Jaxki@6358";
+const ADMIN_PASSWORD = "lusso2024";
+// This must match the ADMIN_TOKEN secret you set in Cloudflare.
+// Keep this value identical to what you entered in Cloudflare Secrets.
+const ADMIN_TOKEN = "lusso_private_the40rk1ngb3st";
 const SESSION_KEY    = "lusso_admin_authed";
 
 // ── Auth ─────────────────────────────────────────────────────────────────────
@@ -569,7 +572,7 @@ async function loadBookings() {
 
   let res, data;
   try {
-    res  = await fetch("/api/admin/bookings", { headers: { "Accept": "application/json" } });
+    res  = await fetch("/api/admin/bookings", { headers: { "Accept": "application/json", "x-admin-token": ADMIN_TOKEN } });
     data = await res.json();
   } catch(e) {
     tbody.innerHTML = `<tr class="state-row"><td colspan="10"><span class="state-icon">⚠️</span><span class="state-msg">Could not reach the API. Is your backend deployed?</span></td></tr>`;
@@ -685,7 +688,7 @@ async function cancelBooking(id) {
   try {
     const res  = await fetch("/api/admin/cancel", {
       method:  "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
       body:    JSON.stringify({ id })
     });
     const data = await res.json();
