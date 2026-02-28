@@ -10,7 +10,7 @@
 // =============================================================================
 
 const CORS_HEADERS = {
-  "access-control-allow-origin": "*",
+  "access-control-allow-origin": "https://lussoautostudio.ca",
   "access-control-allow-methods": "POST, OPTIONS",
   "access-control-allow-headers": "content-type",
 };
@@ -143,6 +143,9 @@ export async function onRequestPost({ request, env }) {
     return json({ ok: false, error: `Booking would end at ${end_hour}:00, past closing (${CLOSE_HOUR}:00)` }, 400);
   }
   if (!name)    return json({ ok: false, error: "Name is required" }, 400);
+  if (!/^[\d\s\(\)\+\-\.]{7,20}$/.test(phone)) {
+    return json({ ok: false, error: "Invalid phone number format" }, 400);
+  }
   if (!phone)   return json({ ok: false, error: "Phone is required" }, 400);
   if (!vehicle) return json({ ok: false, error: "Vehicle is required" }, 400);
 
@@ -171,7 +174,8 @@ export async function onRequestPost({ request, env }) {
       return json({ ok: false, error: "That time slot is no longer available. Please choose another time." }, 409);
     }
   } catch (e) {
-    return json({ ok: false, error: "Database error during overlap check", details: String(e?.message ?? e) }, 500);
+    console.error("[book] overlap check error:", e?.message ?? e);
+    return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
   }
 
   // ── Insert ──────────────────────────────────────────────────────────────────
@@ -186,7 +190,8 @@ export async function onRequestPost({ request, env }) {
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)`
     ).bind(id, date, start_hour, duration_hours, end_hour, service, name, phone, vehicle, city, notes, created_at).run();
   } catch (e) {
-    return json({ ok: false, error: "Failed to save booking", details: String(e?.message ?? e) }, 500);
+    console.error("[book] insert error:", e?.message ?? e);
+    return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
   }
 
   // ── Send notification email (non-blocking) ──────────────────────────────────
