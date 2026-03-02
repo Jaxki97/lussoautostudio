@@ -1040,9 +1040,75 @@
     })();
 
     // ── Membership form submit ────────────────────────────────────────────────
-    document.getElementById("submitBtn").addEventListener("click", function(){
-      document.getElementById("realSubmit").click();
-    });
+    (function(){
+      const submitBtn  = document.getElementById("submitBtn");
+      const statusDiv  = document.createElement("div");
+      statusDiv.style.cssText = "margin-top:10px;font-size:13px;color:rgba(255,255,255,.7);min-height:18px;";
+      submitBtn.parentElement.insertAdjacentElement("afterend", statusDiv);
+
+      function setStatus(msg, color) {
+        statusDiv.textContent = msg;
+        statusDiv.style.color = color || "rgba(255,255,255,.7)";
+      }
+      function setLoading(on) {
+        submitBtn.style.opacity       = on ? ".6"    : "1";
+        submitBtn.style.pointerEvents = on ? "none"  : "auto";
+        submitBtn.textContent         = on ? "Submitting…" : "Submit Request →";
+      }
+
+      submitBtn.addEventListener("click", async function() {
+        const name    = document.getElementById("name").value.trim();
+        const phone   = document.getElementById("phone").value.trim();
+        const vehicle = document.getElementById("vehicle").value.trim();
+        const city    = document.getElementById("city").value.trim();
+        const parking = document.getElementById("parking").value;
+        const start   = document.getElementById("start").value;
+        const message = document.getElementById("msg").value.trim();
+
+        if (!name || !phone || !vehicle || !city || !parking || !start) {
+          setStatus("Please fill in all required fields.", "#f87171");
+          return;
+        }
+
+        setLoading(true);
+        setStatus("Sending your application…");
+
+        let res, data;
+        try {
+          res  = await fetch("/api/membership/apply", {
+            method:  "POST",
+            headers: { "Content-Type": "application/json" },
+            body:    JSON.stringify({
+              name, phone, vehicle, city,
+              parking, preferred_start: start, message
+            }),
+          });
+          data = await res.json();
+        } catch(e) {
+          setLoading(false);
+          setStatus("Network error — please try again.", "#f87171");
+          return;
+        }
+
+        setLoading(false);
+
+        if (res.ok && data && data.ok) {
+          document.getElementById("membershipForm").style.display = "none";
+          const thanks = document.createElement("div");
+          thanks.style.cssText = "padding:28px 0;text-align:center;";
+          thanks.innerHTML = [
+            "<div style=\"font-size:32px;margin-bottom:14px\">✓</div>",
+            "<div style=\"font-family:\'Cormorant Garamond\',serif;font-size:22px;margin-bottom:10px;color:#c7a76a\">Application Received</div>",
+            "<div style=\"color:rgba(255,255,255,.65);line-height:1.7;font-size:14px;max-width:340px;margin:0 auto\">",
+            "Thank you for your interest — we will get back to you with a decision as soon as possible.",
+            "</div>"
+          ].join("");
+          document.getElementById("membershipForm").insertAdjacentElement("afterend", thanks);
+        } else {
+          setStatus((data && data.error) || "Something went wrong. Please try again.", "#f87171");
+        }
+      });
+    })();
 
     // =========================================================================
     // BOOKING WIDGET
