@@ -1,0 +1,429 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Lusso Admin — Membership</title>
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:#09090b; --bg2:#0f0f12; --bg3:#141418;
+      --line:rgba(255,255,255,.07); --line2:rgba(199,167,106,.20);
+      --text:rgba(255,255,255,.92); --muted:rgba(255,255,255,.55); --muted2:rgba(255,255,255,.30);
+      --gold:#c7a76a; --gold2:#a8894e;
+      --green:#4ade80; --red:#f87171; --blue:#60a5fa; --orange:#fb923c;
+      --radius:18px; --mono:"DM Mono",monospace;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;min-height:100vh}
+
+    /* Login */
+    #loginScreen{position:fixed;inset:0;z-index:100;display:flex;align-items:center;justify-content:center;background:var(--bg)}
+    .login-box{width:min(380px,92vw);padding:36px;border-radius:24px;background:var(--bg2);box-shadow:0 0 0 1px var(--line2),0 32px 80px rgba(0,0,0,.6);text-align:center}
+    .login-logo{width:52px;height:52px;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));box-shadow:0 0 0 1px var(--line2) inset;display:grid;place-items:center;margin:0 auto 18px}
+    .login-logo span{font-family:"Cormorant Garamond",serif;font-size:26px;color:var(--gold)}
+    .login-box h1{font-family:"Cormorant Garamond",serif;font-size:26px;margin-bottom:6px}
+    .login-box p{color:var(--muted);font-size:13px;margin-bottom:24px}
+    .login-box input{width:100%;padding:13px 16px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:var(--bg3);color:var(--text);font-size:15px;letter-spacing:.08em;outline:none;text-align:center;transition:border-color .2s,box-shadow .2s}
+    .login-box input:focus{border-color:rgba(199,167,106,.45);box-shadow:0 0 0 3px rgba(199,167,106,.12)}
+    .login-btn{width:100%;margin-top:12px;padding:13px;border-radius:14px;border:none;background:var(--gold);color:#09090b;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s}
+    .login-btn:hover{opacity:.88}
+    .login-err{margin-top:10px;color:var(--red);font-size:13px;min-height:18px}
+
+    /* App */
+    #app{display:none}
+    header{position:sticky;top:0;z-index:40;border-bottom:1px solid var(--line);background:rgba(9,9,11,.82);backdrop-filter:blur(12px);padding:0 24px}
+    .hrow{max-width:1300px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:16px;height:58px}
+    .brand{display:flex;align-items:center;gap:12px}
+    .hlogo{width:34px;height:34px;border-radius:999px;display:grid;place-items:center;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.04));box-shadow:0 0 0 1px var(--line2) inset;flex-shrink:0}
+    .hlogo span{font-family:"Cormorant Garamond",serif;font-size:18px;color:var(--gold)}
+    .brand-name{font-family:"Cormorant Garamond",serif;font-size:17px}
+    .brand-tag{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted2);margin-top:1px}
+    .header-right{display:flex;align-items:center;gap:10px}
+    .hbtn{padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:var(--muted);font-size:12px;cursor:pointer;transition:background .2s,color .2s}
+    .hbtn:hover{background:rgba(255,255,255,.08);color:var(--text)}
+    .hbtn-gold{border-color:rgba(199,167,106,.18)}
+    .hbtn-gold:hover{background:rgba(199,167,106,.08);color:var(--gold)}
+    .nav-link{padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:var(--muted);font-size:12px;cursor:pointer;text-decoration:none;transition:background .2s,color .2s}
+    .nav-link:hover{background:rgba(255,255,255,.08);color:var(--text)}
+
+    .wrap{max-width:1300px;margin:0 auto;padding:28px 24px 80px}
+
+    /* Stats */
+    .stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:24px}
+    @media(min-width:640px){.stats{grid-template-columns:repeat(4,1fr)}}
+    .stat-card{border-radius:var(--radius);padding:16px;background:var(--bg2);box-shadow:0 0 0 1px var(--line);transition:box-shadow .2s}
+    .stat-card:hover{box-shadow:0 0 0 1px var(--line2)}
+    .stat-label{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted2)}
+    .stat-val{font-family:var(--mono);font-size:28px;font-weight:500;color:var(--text);margin-top:8px;line-height:1}
+    .stat-val.gold{color:var(--gold)}
+    .stat-sub{font-size:12px;color:var(--muted);margin-top:6px}
+
+    /* Filters */
+    .filters{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
+    .filters select{padding:9px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.08);background:var(--bg2);color:var(--text);font-size:13px;outline:none;cursor:pointer;transition:border-color .2s;appearance:none}
+    .filters select:focus{border-color:rgba(199,167,106,.35)}
+    .filter-count{margin-left:auto;font-size:12px;color:var(--muted2);font-family:var(--mono)}
+
+    /* Cards grid */
+    .cards-grid{display:grid;gap:14px;grid-template-columns:1fr}
+    @media(min-width:860px){.cards-grid{grid-template-columns:repeat(2,1fr)}}
+    @media(min-width:1200px){.cards-grid{grid-template-columns:repeat(3,1fr)}}
+
+    .app-card{border-radius:var(--radius);background:var(--bg2);box-shadow:0 0 0 1px var(--line);padding:20px;transition:box-shadow .2s}
+    .app-card:hover{box-shadow:0 0 0 1px var(--line2)}
+    .app-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:14px}
+    .app-name{font-size:16px;font-weight:600}
+    .app-date{font-family:var(--mono);font-size:11px;color:var(--muted2);margin-top:3px}
+    .app-field{font-size:13px;color:var(--muted);margin-top:6px;line-height:1.5}
+    .app-field b{color:var(--text);font-weight:600}
+    .app-notes{margin-top:10px;font-size:12px;color:var(--muted2);background:var(--bg3);border-radius:10px;padding:10px 12px;line-height:1.5;border:1px solid var(--line)}
+
+    /* Badges */
+    .badge{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.04em;white-space:nowrap}
+    .badge-dot{width:5px;height:5px;border-radius:99px}
+    .badge-pending  {background:rgba(251,146,60,.10);color:var(--orange);border:1px solid rgba(251,146,60,.20)}
+    .badge-pending .badge-dot{background:var(--orange)}
+    .badge-accepted {background:rgba(96,165,250,.10);color:var(--blue);border:1px solid rgba(96,165,250,.20)}
+    .badge-accepted .badge-dot{background:var(--blue)}
+    .badge-active   {background:rgba(74,222,128,.10);color:var(--green);border:1px solid rgba(74,222,128,.20)}
+    .badge-active .badge-dot{background:var(--green)}
+    .badge-rejected {background:rgba(248,113,113,.10);color:var(--red);border:1px solid rgba(248,113,113,.20)}
+    .badge-rejected .badge-dot{background:var(--red)}
+    .badge-cancelled{background:rgba(255,255,255,.05);color:var(--muted2);border:1px solid var(--line)}
+    .badge-cancel_scheduled{background:rgba(251,146,60,.08);color:var(--orange);border:1px solid rgba(251,146,60,.15)}
+
+    /* Actions */
+    .app-actions{margin-top:16px;display:flex;flex-wrap:wrap;gap:8px;border-top:1px solid var(--line);padding-top:14px}
+    .act-btn{padding:7px 14px;border-radius:999px;border:none;font-size:12px;font-weight:600;cursor:pointer;transition:opacity .15s,background .2s}
+    .act-btn:hover{opacity:.85}
+    .act-accept{background:rgba(74,222,128,.15);color:var(--green);border:1px solid rgba(74,222,128,.25)}
+    .act-reject{background:rgba(248,113,113,.10);color:var(--red);border:1px solid rgba(248,113,113,.20)}
+    .act-cancel{background:rgba(251,146,60,.10);color:var(--orange);border:1px solid rgba(251,146,60,.20)}
+    .act-cancel-now{background:rgba(248,113,113,.08);color:var(--red);border:1px solid rgba(248,113,113,.15)}
+    .act-log{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--line)}
+
+    /* Log drawer */
+    .log-drawer{margin-top:12px;display:none}
+    .log-drawer.open{display:block}
+    .log-entry{font-size:12px;color:var(--muted);padding:6px 0;border-bottom:1px solid var(--line);font-family:var(--mono)}
+    .log-entry:last-child{border-bottom:none}
+    .log-entry .log-time{color:var(--muted2);font-size:11px}
+
+    /* Reject modal */
+    .modal-bg{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,.7);backdrop-filter:blur(4px);display:none;align-items:center;justify-content:center}
+    .modal-bg.open{display:flex}
+    .modal{background:var(--bg2);border:1px solid var(--line2);border-radius:24px;padding:28px;width:min(440px,94vw);box-shadow:0 32px 80px rgba(0,0,0,.6)}
+    .modal h3{font-family:"Cormorant Garamond",serif;font-size:22px;margin-bottom:8px}
+    .modal p{color:var(--muted);font-size:13px;margin-bottom:16px}
+    .modal textarea{width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.10);background:var(--bg3);color:var(--text);font-size:13px;min-height:100px;resize:vertical;outline:none;transition:border-color .2s}
+    .modal textarea:focus{border-color:rgba(199,167,106,.45)}
+    .modal-actions{margin-top:14px;display:flex;gap:10px}
+    .modal-confirm{flex:1;padding:12px;border-radius:14px;border:none;background:var(--red);color:#fff;font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s}
+    .modal-confirm:hover{opacity:.85}
+    .modal-cancel{flex:1;padding:12px;border-radius:14px;border:1px solid var(--line);background:transparent;color:var(--muted);font-size:14px;cursor:pointer;transition:background .2s}
+    .modal-cancel:hover{background:rgba(255,255,255,.05)}
+
+    /* Empty */
+    .empty{text-align:center;padding:60px 20px;color:var(--muted2)}
+    .empty-icon{font-size:36px;margin-bottom:12px}
+
+    /* Section head */
+    .section-head{display:flex;align-items:baseline;gap:10px;margin-bottom:16px}
+    .section-head h2{font-family:"Cormorant Garamond",serif;font-size:22px}
+    .section-head span{font-size:12px;color:var(--muted2);font-family:var(--mono)}
+
+    .rejection-note{margin-top:8px;font-size:12px;color:var(--red);background:rgba(248,113,113,.06);border:1px solid rgba(248,113,113,.15);border-radius:10px;padding:8px 12px}
+  </style>
+</head>
+<body>
+
+<!-- Login -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo"><span>L</span></div>
+    <h1>Lusso Admin</h1>
+    <p>Membership Applications</p>
+    <input id="pwInput" type="password" placeholder="••••••••" autocomplete="current-password" />
+    <button class="login-btn" id="loginBtn">Unlock</button>
+    <div class="login-err" id="loginErr"></div>
+  </div>
+</div>
+
+<!-- Reject modal -->
+<div class="modal-bg" id="rejectModal">
+  <div class="modal">
+    <h3>Reject Application</h3>
+    <p>Enter a reason for rejection (stored internally, not shown to applicant).</p>
+    <textarea id="rejectReason" placeholder="e.g. No private driveway access, not a fit for current roster…"></textarea>
+    <div class="modal-actions">
+      <button class="modal-cancel" id="rejectCancel">Cancel</button>
+      <button class="modal-confirm" id="rejectConfirm">Confirm Rejection</button>
+    </div>
+  </div>
+</div>
+
+<!-- App -->
+<div id="app">
+  <header>
+    <div class="hrow">
+      <div class="brand">
+        <div class="hlogo"><span>L</span></div>
+        <div>
+          <div class="brand-name">Lusso Auto Studio</div>
+          <div class="brand-tag">Membership Dashboard</div>
+        </div>
+      </div>
+      <div class="header-right">
+        <a class="nav-link" href="/admin">← Bookings</a>
+        <button class="hbtn" id="refreshBtn">↻ Refresh</button>
+        <button class="hbtn hbtn-gold" id="logoutBtn">Lock</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat-card"><div class="stat-label">Total</div><div class="stat-val gold" id="statTotal">—</div><div class="stat-sub">Applications</div></div>
+      <div class="stat-card"><div class="stat-label">Pending</div><div class="stat-val" id="statPending">—</div><div class="stat-sub">Awaiting review</div></div>
+      <div class="stat-card"><div class="stat-label">Active</div><div class="stat-val" id="statActive">—</div><div class="stat-sub">Members</div></div>
+      <div class="stat-card"><div class="stat-label">Accepted</div><div class="stat-val" id="statAccepted">—</div><div class="stat-sub">Payment pending</div></div>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <select id="filterStatus">
+        <option value="all">All statuses</option>
+        <option value="pending" selected>Pending</option>
+        <option value="accepted">Accepted</option>
+        <option value="active">Active</option>
+        <option value="rejected">Rejected</option>
+        <option value="cancelled">Cancelled</option>
+        <option value="cancel_scheduled">Cancel Scheduled</option>
+      </select>
+      <span class="filter-count" id="filterCount"></span>
+    </div>
+
+    <div class="section-head">
+      <h2>Applications</h2>
+      <span id="tableSubtitle"></span>
+    </div>
+
+    <div class="cards-grid" id="cardsGrid">
+      <div class="empty"><div class="empty-icon">⏳</div>Loading…</div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Config ────────────────────────────────────────────────────────────────────
+// Change this to match your ADMIN_PASSWORD in admin.html
+const ADMIN_PASSWORD = "Jaxki@6358";
+// Change this to match your ADMIN_TOKEN Cloudflare secret
+const ADMIN_TOKEN    = "lusso_private_the40rk1ngb3st";
+const SESSION_KEY    = "lusso_admin_authed";
+
+// ── Auth ──────────────────────────────────────────────────────────────────────
+function isAuthed() { return sessionStorage.getItem(SESSION_KEY) === "1"; }
+function unlock() {
+  sessionStorage.setItem(SESSION_KEY, "1");
+  document.getElementById("loginScreen").style.display = "none";
+  document.getElementById("app").style.display = "block";
+  loadApplications();
+}
+function lock() {
+  sessionStorage.removeItem(SESSION_KEY);
+  document.getElementById("loginScreen").style.display = "flex";
+  document.getElementById("app").style.display = "none";
+  document.getElementById("pwInput").value = "";
+}
+
+document.getElementById("loginBtn").addEventListener("click", tryLogin);
+document.getElementById("pwInput").addEventListener("keydown", e => { if(e.key==="Enter") tryLogin(); });
+function tryLogin() {
+  if (document.getElementById("pwInput").value === ADMIN_PASSWORD) {
+    unlock();
+  } else {
+    const err = document.getElementById("loginErr");
+    err.textContent = "Incorrect password.";
+    document.getElementById("pwInput").value = "";
+    setTimeout(() => err.textContent = "", 2500);
+  }
+}
+document.getElementById("logoutBtn").addEventListener("click", lock);
+document.getElementById("refreshBtn").addEventListener("click", loadApplications);
+if (isAuthed()) unlock();
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+function esc(s) {
+  return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function fmtDate(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return d.toLocaleDateString("en-CA", { year:"numeric", month:"short", day:"numeric" })
+       + " " + d.toLocaleTimeString("en-CA", { hour:"2-digit", minute:"2-digit" });
+}
+function badgeHtml(status) {
+  const labels = {
+    pending:          "Pending",
+    accepted:         "Accepted",
+    active:           "Active",
+    rejected:         "Rejected",
+    cancelled:        "Cancelled",
+    cancel_scheduled: "Cancel Scheduled",
+  };
+  return `<span class="badge badge-${esc(status)}"><span class="badge-dot"></span>${esc(labels[status] || status)}</span>`;
+}
+
+// ── Data ──────────────────────────────────────────────────────────────────────
+let allApplications = [];
+
+async function loadApplications() {
+  document.getElementById("cardsGrid").innerHTML = `<div class="empty"><div class="empty-icon">⏳</div>Loading…</div>`;
+  let res, data;
+  try {
+    res  = await fetch("/api/admin/membership", { headers: { "x-admin-token": ADMIN_TOKEN } });
+    data = await res.json();
+  } catch {
+    document.getElementById("cardsGrid").innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>Could not reach API.</div>`;
+    return;
+  }
+  if (!res.ok || !data?.ok) {
+    document.getElementById("cardsGrid").innerHTML = `<div class="empty"><div class="empty-icon">⚠️</div>${esc(data?.error || "API error")}</div>`;
+    return;
+  }
+  allApplications = data.applications || [];
+  updateStats();
+  renderCards();
+}
+
+function updateStats() {
+  document.getElementById("statTotal").textContent    = allApplications.length;
+  document.getElementById("statPending").textContent  = allApplications.filter(a => a.status === "pending").length;
+  document.getElementById("statActive").textContent   = allApplications.filter(a => a.status === "active").length;
+  document.getElementById("statAccepted").textContent = allApplications.filter(a => a.status === "accepted").length;
+}
+
+function renderCards() {
+  const statusFilter = document.getElementById("filterStatus").value;
+  let filtered = allApplications.filter(a => statusFilter === "all" || a.status === statusFilter);
+
+  document.getElementById("filterCount").textContent = `${filtered.length} result${filtered.length !== 1 ? "s" : ""}`;
+  document.getElementById("tableSubtitle").textContent = `${filtered.length} application${filtered.length !== 1 ? "s" : ""}`;
+
+  if (!filtered.length) {
+    document.getElementById("cardsGrid").innerHTML = `<div class="empty"><div class="empty-icon">📭</div>No applications match your filter.</div>`;
+    return;
+  }
+
+  document.getElementById("cardsGrid").innerHTML = filtered.map(a => {
+    let log = [];
+    try { log = JSON.parse(a.event_log || "[]"); } catch {}
+
+    const logHtml = log.map(e => `
+      <div class="log-entry">
+        <span class="log-time">${esc(fmtDate(e.at))}</span><br>
+        ${esc(e.note || e.event)}
+      </div>`).join("");
+
+    const actions = buildActions(a);
+    const rejNote = a.status === "rejected" && a.rejection_reason
+      ? `<div class="rejection-note">Rejection reason: ${esc(a.rejection_reason)}</div>` : "";
+    const cancelNote = a.cancel_at
+      ? `<div class="app-field" style="margin-top:8px;color:var(--orange)">⏳ Cancels on: <b>${esc(fmtDate(a.cancel_at))}</b></div>` : "";
+
+    return `
+      <div class="app-card" id="card-${esc(a.id)}">
+        <div class="app-card-top">
+          <div>
+            <div class="app-name">${esc(a.name)}</div>
+            <div class="app-date">${esc(fmtDate(a.created_at))}</div>
+          </div>
+          ${badgeHtml(a.status)}
+        </div>
+        <div class="app-field"><b>Phone:</b> <a href="tel:${esc(a.phone)}" style="color:var(--gold);text-decoration:none">${esc(a.phone)}</a></div>
+        <div class="app-field"><b>Vehicle:</b> ${esc(a.vehicle)}</div>
+        <div class="app-field"><b>City:</b> ${esc(a.city)}</div>
+        <div class="app-field"><b>Parking:</b> ${esc(a.parking)}</div>
+        <div class="app-field"><b>Start:</b> ${esc(a.preferred_start)}</div>
+        ${cancelNote}
+        ${rejNote}
+        ${a.message ? `<div class="app-notes">${esc(a.message)}</div>` : ""}
+        <div class="app-actions">
+          ${actions}
+          <button class="act-btn act-log" onclick="toggleLog('${esc(a.id)}')">History</button>
+        </div>
+        <div class="log-drawer" id="log-${esc(a.id)}">${logHtml || '<div class="log-entry">No events yet.</div>'}</div>
+      </div>`;
+  }).join("");
+}
+
+function buildActions(a) {
+  let btns = "";
+  if (a.status === "pending") {
+    btns += `<button class="act-btn act-accept" onclick="doAction('${esc(a.id)}','accept')">✓ Accept</button>`;
+    btns += `<button class="act-btn act-reject" onclick="openReject('${esc(a.id)}')">✗ Reject</button>`;
+  }
+  if (["active","accepted"].includes(a.status)) {
+    btns += `<button class="act-btn act-cancel" onclick="doAction('${esc(a.id)}','cancel')">Cancel (30-day notice)</button>`;
+    btns += `<button class="act-btn act-cancel-now" onclick="confirmImmediateCancel('${esc(a.id)}')">Cancel Immediately</button>`;
+  }
+  return btns;
+}
+
+function toggleLog(id) {
+  const el = document.getElementById(`log-${id}`);
+  el.classList.toggle("open");
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+async function doAction(id, action, reason = "") {
+  const res  = await fetch("/api/admin/membership-action", {
+    method:  "POST",
+    headers: { "Content-Type":"application/json", "x-admin-token": ADMIN_TOKEN },
+    body:    JSON.stringify({ id, action, reason }),
+  });
+  const data = await res.json();
+  if (data.ok) {
+    await loadApplications();
+  } else {
+    alert(data.error || "Action failed.");
+  }
+}
+
+// Reject modal
+let pendingRejectId = null;
+function openReject(id) {
+  pendingRejectId = id;
+  document.getElementById("rejectReason").value = "";
+  document.getElementById("rejectModal").classList.add("open");
+}
+document.getElementById("rejectCancel").addEventListener("click", () => {
+  document.getElementById("rejectModal").classList.remove("open");
+  pendingRejectId = null;
+});
+document.getElementById("rejectConfirm").addEventListener("click", async () => {
+  const reason = document.getElementById("rejectReason").value.trim();
+  if (!reason) { alert("Please enter a rejection reason."); return; }
+  document.getElementById("rejectModal").classList.remove("open");
+  await doAction(pendingRejectId, "reject", reason);
+  pendingRejectId = null;
+});
+
+function confirmImmediateCancel(id) {
+  if (confirm("Immediately cancel this membership? This cannot be undone.")) {
+    doAction(id, "cancel_immediate");
+  }
+}
+
+// Filter
+document.getElementById("filterStatus").addEventListener("change", renderCards);
+</script>
+</body>
+</html>
