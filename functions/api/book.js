@@ -102,6 +102,53 @@ async function sendBookingEmail(booking, env) {
   }
 }
 
+// ── Customer confirmation email ───────────────────────────────────────────────
+async function sendCustomerConfirmation(booking, env) {
+  if (!env.RESEND_API_KEY || !booking.email) return;
+
+  const fromEmail = env.FROM_EMAIL || "onboarding@resend.dev";
+  const dateLabel = formatDate(booking.date);
+  const timeLabel = `${formatHour(booking.start_hour)} – ${formatHour(booking.end_hour)}`;
+
+  const html = `
+    <div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;background:#09090b;color:#ece9e2;border-radius:16px;overflow:hidden;border:1px solid rgba(199,167,106,.20)">
+      <div style="background:linear-gradient(135deg,rgba(199,167,106,.15),rgba(199,167,106,.05));padding:24px 28px;border-bottom:1px solid rgba(199,167,106,.15)">
+        <p style="margin:0;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#a8894e">Lusso Auto Studio</p>
+        <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;color:#c7a76a">Your Appointment is Confirmed</h1>
+      </div>
+      <div style="padding:24px 28px">
+        <p style="margin:0 0 20px;color:rgba(255,255,255,.70);line-height:1.7">Hi ${booking.name}, your booking has been received and confirmed. Here are your details:</p>
+        <table style="width:100%;border-collapse:collapse">
+          <tr><td style="padding:8px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em;width:110px">Date</td><td style="padding:8px 0;font-size:14px;font-weight:600">${dateLabel}</td></tr>
+          <tr><td style="padding:8px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Time</td><td style="padding:8px 0;font-size:14px;font-weight:600;color:#c7a76a">${timeLabel}</td></tr>
+          <tr><td style="padding:8px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Service</td><td style="padding:8px 0;font-size:14px">${booking.service}</td></tr>
+          <tr><td style="padding:8px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Vehicle</td><td style="padding:8px 0;font-size:14px">${booking.vehicle}</td></tr>
+        </table>
+        <div style="margin-top:20px;padding:14px 16px;border-radius:12px;background:rgba(199,167,106,.08);border:1px solid rgba(199,167,106,.18);color:rgba(255,255,255,.65);font-size:13px;line-height:1.6">
+          We will confirm final details by text before your appointment. If you need to make any changes, please reply to this email or contact us directly.
+        </div>
+      </div>
+      <div style="padding:16px 28px;border-top:1px solid rgba(255,255,255,.07);font-size:11px;color:rgba(255,255,255,.30)">
+        Booking ID: ${booking.id} · Lusso Auto Studio · lussoautostudio.ca
+      </div>
+    </div>`;
+
+  try {
+    await fetch("https://api.resend.com/emails", {
+      method:  "POST",
+      headers: { "Authorization": `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        from:    fromEmail,
+        to:      [booking.email],
+        subject: `✓ Booking Confirmed — ${dateLabel} at ${formatHour(booking.start_hour)}`,
+        html,
+      }),
+    });
+  } catch (e) {
+    console.error("Customer confirmation email failed:", e?.message ?? e);
+  }
+}
+
 export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS_HEADERS });
 }
@@ -118,6 +165,7 @@ export async function onRequestPost({ request, env }) {
   const service        = sanitize(body.service);
   const name           = sanitize(body.name);
   const phone          = sanitize(body.phone);
+  const email          = sanitize(body.email);
   const vehicle        = sanitize(body.vehicle);
   const city           = sanitize(body.city);
   const notes          = sanitize(body.notes);
@@ -147,6 +195,9 @@ export async function onRequestPost({ request, env }) {
     return json({ ok: false, error: "Invalid phone number format" }, 400);
   }
   if (!phone)   return json({ ok: false, error: "Phone is required" }, 400);
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return json({ ok: false, error: "A valid email address is required" }, 400);
+  }
   if (!vehicle) return json({ ok: false, error: "Vehicle is required" }, 400);
 
   // ── Date rules ──────────────────────────────────────────────────────────────
@@ -194,8 +245,9 @@ export async function onRequestPost({ request, env }) {
     return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
   }
 
-  // ── Send notification email (non-blocking) ──────────────────────────────────
-  await sendBookingEmail({ id, date, start_hour, end_hour, service, name, phone, vehicle, city, notes }, env);
+  // ── Send notification emails (non-blocking) ─────────────────────────────────
+  await sendBookingEmail({ id, date, start_hour, end_hour, service, name, phone, email, vehicle, city, notes }, env);
+  await sendCustomerConfirmation({ id, date, start_hour, end_hour, service, name, email, vehicle }, env);
 
   return json({ ok: true, id, date, start_hour, end_hour, service }, 201);
 }
