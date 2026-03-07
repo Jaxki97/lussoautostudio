@@ -823,6 +823,11 @@
                 </div>
               </div>
 
+              <div>
+                <label for="bk_email">Email <span style="color:var(--muted2);font-size:11px;letter-spacing:.1em">(confirmation sent here)</span></label>
+                <input id="bk_email" type="email" placeholder="your@email.com" required />
+              </div>
+
               <div class="two">
                 <div>
                   <label for="bk_vehicle">Vehicle</label>
@@ -1286,13 +1291,14 @@
       async function bookNow(){
         const name    = document.getElementById("bk_name").value.trim();
         const phone   = document.getElementById("bk_phone").value.trim();
+        const email   = document.getElementById("bk_email").value.trim();
         const vehicle = document.getElementById("bk_vehicle").value.trim();
         const city    = document.getElementById("bk_city").value.trim();
         const service = serviceEl.value;
         const notes   = document.getElementById("bk_notes").value.trim();
         const date    = dateEl.value;
 
-        if(!name || !phone || !vehicle || !city || !service || !date){
+        if(!name || !phone || !email || !vehicle || !city || !service || !date){
           setStatus("Please fill in all required fields first.");
           return;
         }
@@ -1318,6 +1324,7 @@
               service,
               name,
               phone,
+              email,
               vehicle,
               city,
               notes
