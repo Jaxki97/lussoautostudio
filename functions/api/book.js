@@ -237,9 +237,9 @@ export async function onRequestPost({ request, env }) {
     await env.DB.prepare(
       `INSERT INTO bookings
          (id, date, start_hour, duration_hours, end_hour,
-          service, name, phone, vehicle, city, notes, status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)`
-    ).bind(id, date, start_hour, duration_hours, end_hour, service, name, phone, vehicle, city, notes, created_at).run();
+          service, name, phone, email, vehicle, city, notes, status, created_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)`
+    ).bind(id, date, start_hour, duration_hours, end_hour, service, name, phone, email, vehicle, city, notes, created_at).run();
   } catch (e) {
     console.error("[book] insert error:", e?.message ?? e);
     return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
