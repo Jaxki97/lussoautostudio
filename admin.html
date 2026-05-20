@@ -364,6 +364,123 @@
       font-size: 22px; letter-spacing: .01em;
     }
     .section-head span { font-size: 12px; color: var(--muted2); font-family: var(--mono); }
+
+    /* ── Availability panel ───────────────────────────────────────────────── */
+    .avail-panel {
+      margin-top: 36px;
+      border-radius: var(--radius);
+      border: 1px solid var(--line2);
+      background: var(--bg2);
+      overflow: hidden;
+    }
+    .avail-header {
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--line);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .avail-header-dot {
+      width: 8px; height: 8px; border-radius: 99px;
+      background: var(--gold); box-shadow: 0 0 0 3px rgba(199,167,106,.15);
+      flex-shrink: 0;
+    }
+    .avail-header h2 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 20px; letter-spacing: .01em;
+    }
+    .avail-header p { font-size: 12px; color: var(--muted2); margin-left: auto; }
+    .avail-body { padding: 20px 22px 24px; }
+
+    .avail-row {
+      display: flex; flex-wrap: wrap; gap: 20px;
+      align-items: flex-end;
+      margin-bottom: 20px;
+    }
+    .avail-field { display: flex; flex-direction: column; gap: 6px; }
+    .avail-label {
+      font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--muted2);
+    }
+    .avail-select {
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      cursor: pointer;
+      min-width: 140px;
+      transition: border-color .2s;
+      appearance: none; -webkit-appearance: none;
+    }
+    .avail-select:focus { border-color: rgba(199,167,106,.40); }
+
+    .avail-save-btn {
+      padding: 10px 20px;
+      border-radius: 12px;
+      border: none;
+      background: var(--gold);
+      color: #09090b;
+      font-size: 13px; font-weight: 700;
+      cursor: pointer;
+      transition: opacity .15s;
+      white-space: nowrap;
+    }
+    .avail-save-btn:hover { opacity: .88; }
+    .avail-save-btn:disabled { opacity: .45; cursor: default; }
+
+    .avail-divider { height: 1px; background: var(--line); margin: 18px 0; }
+
+    .blocked-row {
+      display: flex; flex-wrap: wrap; gap: 10px;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+    .blocked-date-input {
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .blocked-date-input:focus { border-color: rgba(199,167,106,.40); }
+    .block-add-btn {
+      padding: 10px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(199,167,106,.25);
+      background: rgba(199,167,106,.08);
+      color: var(--gold);
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      transition: background .15s;
+      white-space: nowrap;
+    }
+    .block-add-btn:hover { background: rgba(199,167,106,.16); }
+
+    .blocked-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .blocked-chip {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(248,113,113,.08);
+      border: 1px solid rgba(248,113,113,.18);
+      font-size: 12px; font-family: var(--mono); color: var(--red);
+    }
+    .blocked-chip button {
+      border: none; background: none; color: rgba(248,113,113,.60);
+      cursor: pointer; font-size: 13px; padding: 0; line-height: 1;
+      transition: color .15s;
+    }
+    .blocked-chip button:hover { color: var(--red); }
+    .avail-status {
+      font-size: 12px; min-height: 18px; margin-top: 10px;
+      color: var(--muted2); font-family: var(--mono);
+    }
+    .avail-status.ok  { color: #4ade80; }
+    .avail-status.err { color: var(--red); }
   </style>
 </head>
 <body>
@@ -483,6 +600,44 @@
       </div>
     </div>
 
+    <!-- Availability Panel -->
+    <div class="avail-panel">
+      <div class="avail-header">
+        <span class="avail-header-dot"></span>
+        <h2>Availability</h2>
+        <p id="availLastSaved"></p>
+      </div>
+      <div class="avail-body">
+
+        <!-- Hours -->
+        <div class="avail-row">
+          <div class="avail-field">
+            <label class="avail-label" for="availOpenHour">Opens At</label>
+            <select class="avail-select" id="availOpenHour"></select>
+          </div>
+          <div class="avail-field">
+            <label class="avail-label" for="availCloseHour">Last Booking Ends By</label>
+            <select class="avail-select" id="availCloseHour"></select>
+          </div>
+          <button class="avail-save-btn" id="availSaveHours">Save Hours</button>
+        </div>
+
+        <div class="avail-divider"></div>
+
+        <!-- Blocked dates -->
+        <div class="avail-label" style="margin-bottom:10px">Blocked Dates</div>
+        <div class="blocked-row">
+          <input type="date" class="blocked-date-input" id="blockDateInput" />
+          <button class="block-add-btn" id="blockAddBtn">+ Block Date</button>
+        </div>
+        <div class="blocked-list" id="blockedList">
+          <span style="font-size:12px;color:var(--muted2)">No dates blocked</span>
+        </div>
+
+        <div class="avail-status" id="availStatus"></div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -505,6 +660,7 @@ function unlock() {
   document.getElementById("loginScreen").style.display = "none";
   document.getElementById("app").style.display = "block";
   loadBookings();
+  loadAvailability();
 }
 function lock() {
   sessionStorage.removeItem(SESSION_KEY);
@@ -714,6 +870,138 @@ document.getElementById("clearFilter").addEventListener("click", () => {
   renderTable();
 });
 document.getElementById("refreshBtn").addEventListener("click", loadBookings);
+
+// ── Availability panel ────────────────────────────────────────────────────────
+
+// Populate hour dropdowns once
+(function buildHourSelects() {
+  function label(h) {
+    const period = h < 12 ? "AM" : "PM";
+    const h12    = h % 12 === 0 ? 12 : h % 12;
+    return `${h12}:00 ${period}`;
+  }
+  const openSel  = document.getElementById("availOpenHour");
+  const closeSel = document.getElementById("availCloseHour");
+  for (let h = 5; h <= 14; h++) {
+    const o = document.createElement("option");
+    o.value = h; o.textContent = label(h);
+    openSel.appendChild(o);
+  }
+  for (let h = 13; h <= 24; h++) {
+    const o = document.createElement("option");
+    o.value = h; o.textContent = h === 24 ? "12:00 AM (midnight)" : label(h);
+    closeSel.appendChild(o);
+  }
+})();
+
+let currentBlockedDates = [];
+
+function availStatus(msg, type = "") {
+  const el = document.getElementById("availStatus");
+  el.textContent = msg;
+  el.className   = "avail-status" + (type ? " " + type : "");
+  if (msg) setTimeout(() => { if (el.textContent === msg) el.textContent = ""; }, 3500);
+}
+
+function renderBlockedList() {
+  const container = document.getElementById("blockedList");
+  if (!currentBlockedDates.length) {
+    container.innerHTML = '<span style="font-size:12px;color:var(--muted2)">No dates blocked</span>';
+    return;
+  }
+  const sorted = [...currentBlockedDates].sort();
+  container.innerHTML = sorted.map(d =>
+    `<span class="blocked-chip">${formatDate(d)}&nbsp;<span style="font-size:10px;color:var(--muted2)">${d}</span>
+      <button onclick="removeBlockedDate('${d}')" title="Unblock">✕</button>
+    </span>`
+  ).join("");
+}
+
+async function loadAvailability() {
+  try {
+    const res  = await fetch("/api/admin/settings", { headers: { "x-admin-token": ADMIN_TOKEN } });
+    const data = await res.json();
+    if (!data.ok) return;
+    document.getElementById("availOpenHour").value  = data.open_hour;
+    document.getElementById("availCloseHour").value = data.close_hour;
+    currentBlockedDates = data.blocked_dates || [];
+    renderBlockedList();
+  } catch(e) {
+    availStatus("Could not load availability settings.", "err");
+  }
+}
+
+document.getElementById("availSaveHours").addEventListener("click", async () => {
+  const btn       = document.getElementById("availSaveHours");
+  const openHour  = Number(document.getElementById("availOpenHour").value);
+  const closeHour = Number(document.getElementById("availCloseHour").value);
+
+  if (openHour >= closeHour) {
+    availStatus("Close hour must be after open hour.", "err");
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = "Saving…";
+  try {
+    const res  = await fetch("/api/admin/settings", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
+      body:    JSON.stringify({ open_hour: openHour, close_hour: closeHour }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      availStatus("Hours saved.", "ok");
+      document.getElementById("availLastSaved").textContent = "Saved " + new Date().toLocaleTimeString();
+    } else {
+      availStatus(data.error || "Save failed.", "err");
+    }
+  } catch(e) {
+    availStatus("Network error.", "err");
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Save Hours";
+  }
+});
+
+document.getElementById("blockAddBtn").addEventListener("click", async () => {
+  const input = document.getElementById("blockDateInput");
+  const date  = input.value;
+  if (!date) { availStatus("Pick a date first.", "err"); return; }
+  if (currentBlockedDates.includes(date)) {
+    availStatus("That date is already blocked.", "err");
+    return;
+  }
+  const updated = [...currentBlockedDates, date];
+  await saveBlockedDates(updated);
+  input.value = "";
+});
+
+async function removeBlockedDate(date) {
+  const updated = currentBlockedDates.filter(d => d !== date);
+  await saveBlockedDates(updated);
+}
+
+async function saveBlockedDates(dates) {
+  try {
+    const res  = await fetch("/api/admin/settings", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
+      body:    JSON.stringify({ blocked_dates: dates }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      currentBlockedDates = dates;
+      renderBlockedList();
+      availStatus("Blocked dates updated.", "ok");
+      document.getElementById("availLastSaved").textContent = "Saved " + new Date().toLocaleTimeString();
+    } else {
+      availStatus(data.error || "Save failed.", "err");
+    }
+  } catch(e) {
+    availStatus("Network error.", "err");
+  }
+}
 </script>
 </body>
 </html>

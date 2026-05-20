@@ -27,8 +27,9 @@ const CORS_HEADERS = {
   "access-control-allow-headers": "content-type",
 };
 
-const OPEN_HOUR  = 8;   // 8:00 AM  — first possible start
-const CLOSE_HOUR = 20;  // 8:00 PM  — no booking may end after this
+// Default hours — overridden by availability_settings table at runtime
+const DEFAULT_OPEN_HOUR  = 8;
+const DEFAULT_CLOSE_HOUR = 20;
 
 // Map duration (hours) → friendly service name for reference / error messages
 const DURATION_LABELS = {
@@ -94,20 +95,31 @@ export async function onRequestGet({ request, env }) {
     return json({ ok: true, slots: [], reason: "too_far" }, 200);
   }
 
-  // ── Fetch existing bookings ─────────────────────────────────────────────────
-  let existingBookings;
+  // ── Fetch settings + bookings in one batch ──────────────────────────────────
+  let settingsResults, existingBookings;
   try {
-    const { results } = await env.DB.prepare(
-      `SELECT start_hour, end_hour
-         FROM bookings
-        WHERE date = ? AND status = 'active'`
-    )
-      .bind(date)
-      .all();
-    existingBookings = results; // [{ start_hour, end_hour }, ...]
+    const [settingsBatch, bookingsBatch] = await env.DB.batch([
+      env.DB.prepare("SELECT key, value FROM availability_settings"),
+      env.DB.prepare(
+        "SELECT start_hour, end_hour FROM bookings WHERE date = ? AND status = 'active'"
+      ).bind(date),
+    ]);
+    settingsResults  = settingsBatch.results  ?? [];
+    existingBookings = bookingsBatch.results  ?? [];
   } catch (e) {
     console.error("[slots] DB error:", e?.message ?? e);
     return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
+  }
+
+  // ── Resolve open/close hours from settings ──────────────────────────────────
+  const settingsMap = Object.fromEntries(settingsResults.map(r => [r.key, r.value]));
+  const OPEN_HOUR   = parseInt(settingsMap.open_hour  ?? String(DEFAULT_OPEN_HOUR),  10);
+  const CLOSE_HOUR  = parseInt(settingsMap.close_hour ?? String(DEFAULT_CLOSE_HOUR), 10);
+
+  // ── Blocked-date check ──────────────────────────────────────────────────────
+  const blockedDates = JSON.parse(settingsMap.blocked_dates ?? "[]");
+  if (blockedDates.includes(date)) {
+    return json({ ok: true, slots: [], reason: "blocked" }, 200);
   }
 
   // ── Build a set of all occupied hours ──────────────────────────────────────
@@ -144,5 +156,5 @@ export async function onRequestGet({ request, env }) {
     });
   }
 
-  return json({ ok: true, slots, date, duration_hours }, 200);
+  return json({ ok: true, slots, date, duration_hours, open_hour: OPEN_HOUR, close_hour: CLOSE_HOUR }, 200);
 }
