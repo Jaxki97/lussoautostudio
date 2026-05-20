@@ -15,8 +15,8 @@ const CORS_HEADERS = {
   "access-control-allow-headers": "content-type",
 };
 
-const OPEN_HOUR  = 8;
-const CLOSE_HOUR = 20;
+const DEFAULT_OPEN_HOUR  = 8;
+const DEFAULT_CLOSE_HOUR = 20;
 
 const SERVICES = {
   "Maintenance Wash":    1,
@@ -172,12 +172,9 @@ export async function onRequestPost({ request, env }) {
   const start_hour     = Number(body.start_hour);
   const duration_hours = Number(body.duration_hours);
 
-  // ── Validation ──────────────────────────────────────────────────────────────
+  // ── Basic field validation (before DB) ─────────────────────────────────────
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
     return json({ ok: false, error: "Missing or invalid date (expect YYYY-MM-DD)" }, 400);
-  }
-  if (!Number.isInteger(start_hour) || start_hour < OPEN_HOUR || start_hour >= CLOSE_HOUR) {
-    return json({ ok: false, error: `start_hour must be between ${OPEN_HOUR} and ${CLOSE_HOUR - 1}` }, 400);
   }
   if (!SERVICES[service]) {
     return json({ ok: false, error: `Unknown service. Valid: ${Object.keys(SERVICES).join(", ")}` }, 400);
@@ -185,10 +182,6 @@ export async function onRequestPost({ request, env }) {
   const expectedDuration = SERVICES[service];
   if (duration_hours !== expectedDuration) {
     return json({ ok: false, error: `Duration mismatch: "${service}" requires ${expectedDuration} hr(s)` }, 400);
-  }
-  const end_hour = start_hour + duration_hours;
-  if (end_hour > CLOSE_HOUR) {
-    return json({ ok: false, error: `Booking would end at ${end_hour}:00, past closing (${CLOSE_HOUR}:00)` }, 400);
   }
   if (!name)    return json({ ok: false, error: "Name is required" }, 400);
   if (!/^[\d\s\(\)\+\-\.]{7,20}$/.test(phone)) {
@@ -212,6 +205,33 @@ export async function onRequestPost({ request, env }) {
   const diffDays = (d.getTime() - todayUTC.getTime()) / 86_400_000;
   if (diffDays < 0)  return json({ ok: false, error: "Cannot book a date in the past" }, 400);
   if (diffDays > 30) return json({ ok: false, error: "Bookings can only be made up to 30 days ahead" }, 400);
+
+  // ── Load availability settings ──────────────────────────────────────────────
+  let OPEN_HOUR, CLOSE_HOUR;
+  try {
+    const { results: sRows } = await env.DB.prepare(
+      "SELECT key, value FROM availability_settings"
+    ).all();
+    const sm = Object.fromEntries(sRows.map(r => [r.key, r.value]));
+    OPEN_HOUR  = parseInt(sm.open_hour  ?? String(DEFAULT_OPEN_HOUR),  10);
+    CLOSE_HOUR = parseInt(sm.close_hour ?? String(DEFAULT_CLOSE_HOUR), 10);
+    const blockedDates = JSON.parse(sm.blocked_dates ?? "[]");
+    if (blockedDates.includes(date)) {
+      return json({ ok: false, error: "Bookings are not available on this date." }, 409);
+    }
+  } catch (e) {
+    console.error("[book] settings fetch error:", e?.message ?? e);
+    return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
+  }
+
+  // ── Hour validation (uses dynamic open/close) ───────────────────────────────
+  if (!Number.isInteger(start_hour) || start_hour < OPEN_HOUR || start_hour >= CLOSE_HOUR) {
+    return json({ ok: false, error: `start_hour must be between ${OPEN_HOUR} and ${CLOSE_HOUR - 1}` }, 400);
+  }
+  const end_hour = start_hour + duration_hours;
+  if (end_hour > CLOSE_HOUR) {
+    return json({ ok: false, error: `Booking would end at ${end_hour}:00, past closing (${CLOSE_HOUR}:00)` }, 400);
+  }
 
   // ── Overlap check ───────────────────────────────────────────────────────────
   try {
