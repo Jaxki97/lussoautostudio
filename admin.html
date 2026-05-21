@@ -475,6 +475,77 @@
       transition: color .15s;
     }
     .blocked-chip button:hover { color: var(--red); }
+
+    /* Per-date hour override */
+    .hour-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      margin: 12px 0;
+    }
+    .hour-cell {
+      display: flex; align-items: center; gap: 6px;
+      padding: 7px 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: var(--bg3);
+      cursor: pointer;
+      font-size: 12px; font-family: var(--mono);
+      color: var(--muted2);
+      transition: border-color .15s, background .15s, color .15s;
+      user-select: none;
+    }
+    .hour-cell input[type=checkbox] { accent-color: var(--gold); cursor: pointer; margin: 0; }
+    .hour-cell.checked {
+      border-color: rgba(199,167,106,.35);
+      background: rgba(199,167,106,.07);
+      color: var(--gold);
+    }
+    .hour-quick { display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+    .hour-quick-btn {
+      padding: 6px 14px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: var(--bg3); color: var(--muted2);
+      font-size: 12px; cursor: pointer;
+      transition: border-color .15s, color .15s;
+    }
+    .hour-quick-btn:hover { border-color: rgba(199,167,106,.3); color: var(--gold); }
+    .hour-range-row {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      align-items: center; margin: 12px 0;
+    }
+    .hour-range-row select {
+      padding: 8px 12px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: var(--bg3); color: var(--text);
+      font-size: 13px; outline: none;
+    }
+    .hour-range-row select:focus { border-color: rgba(199,167,106,.4); }
+    .range-mark-btn {
+      padding: 8px 14px; border-radius: 10px; font-size: 13px;
+      font-weight: 600; cursor: pointer;
+      border: 1px solid; transition: background .15s;
+    }
+    .range-mark-btn.avail {
+      border-color: rgba(74,222,128,.3); color: #4ade80;
+      background: rgba(74,222,128,.07);
+    }
+    .range-mark-btn.avail:hover { background: rgba(74,222,128,.14); }
+    .range-mark-btn.unavail {
+      border-color: rgba(248,113,113,.3); color: var(--red);
+      background: rgba(248,113,113,.07);
+    }
+    .range-mark-btn.unavail:hover { background: rgba(248,113,113,.14); }
+    .hour-save-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+    .hour-clear-btn {
+      padding: 10px 18px; border-radius: 12px;
+      border: 1px solid rgba(248,113,113,.3);
+      background: rgba(248,113,113,.07); color: var(--red);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+      transition: background .15s;
+    }
+    .hour-clear-btn:hover { background: rgba(248,113,113,.14); }
+
     .avail-status {
       font-size: 12px; min-height: 18px; margin-top: 10px;
       color: var(--muted2); font-family: var(--mono);
@@ -620,6 +691,38 @@
             <select class="avail-select" id="availCloseHour"></select>
           </div>
           <button class="avail-save-btn" id="availSaveHours">Save Hours</button>
+        </div>
+
+        <div class="avail-divider"></div>
+
+        <!-- Per-date hour control -->
+        <div class="avail-label" style="margin-bottom:10px">Per-Date Hour Control</div>
+        <div class="blocked-row">
+          <input type="date" class="blocked-date-input" id="hourOverrideDate" />
+          <button class="block-add-btn" id="hourOverrideLoad">Load Hours</button>
+        </div>
+
+        <div id="hourOverridePanel" style="display:none">
+          <div class="hour-quick">
+            <button class="hour-quick-btn" id="hoursSelectAll">Select All</button>
+            <button class="hour-quick-btn" id="hoursDeselectAll">Deselect All</button>
+          </div>
+
+          <div class="hour-grid" id="hourGrid"></div>
+
+          <div style="font-size:12px;color:var(--muted2);margin:10px 0 4px">Range tool — bulk select hours:</div>
+          <div class="hour-range-row">
+            <select id="rangeFrom"></select>
+            <span style="color:var(--muted2);font-size:13px">to</span>
+            <select id="rangeTo"></select>
+            <button class="range-mark-btn avail" id="rangeMarkAvail">Mark Available</button>
+            <button class="range-mark-btn unavail" id="rangeMarkUnavail">Mark Unavailable</button>
+          </div>
+
+          <div class="hour-save-row">
+            <button class="avail-save-btn" id="hourOverrideSave">Save Hours for this Date</button>
+            <button class="hour-clear-btn" id="hourOverrideClear">Clear Override</button>
+          </div>
         </div>
 
         <div class="avail-divider"></div>
@@ -925,6 +1028,7 @@ async function loadAvailability() {
     document.getElementById("availOpenHour").value  = data.open_hour;
     document.getElementById("availCloseHour").value = data.close_hour;
     currentBlockedDates = data.blocked_dates || [];
+    currentHourOverrides = data.hour_overrides || {};
     renderBlockedList();
   } catch(e) {
     availStatus("Could not load availability settings.", "err");
@@ -963,6 +1067,127 @@ document.getElementById("availSaveHours").addEventListener("click", async () => 
     btn.textContent = "Save Hours";
   }
 });
+
+// ── Per-date hour override ────────────────────────────────────────────────────
+
+let currentHourOverrides = {}; // { "YYYY-MM-DD": [0,1,2,...] }
+
+(function buildHourOverrideUI() {
+  const grid = document.getElementById("hourGrid");
+  const fromSel = document.getElementById("rangeFrom");
+  const toSel   = document.getElementById("rangeTo");
+
+  for (let h = 0; h < 24; h++) {
+    const label = String(h).padStart(2, "0") + ":00";
+
+    const cell = document.createElement("label");
+    cell.className = "hour-cell";
+    cell.dataset.hour = h;
+    cell.innerHTML = `<input type="checkbox" value="${h}" /> ${label}`;
+    cell.querySelector("input").addEventListener("change", () => {
+      cell.classList.toggle("checked", cell.querySelector("input").checked);
+    });
+    grid.appendChild(cell);
+
+    [fromSel, toSel].forEach(sel => {
+      const opt = document.createElement("option");
+      opt.value = h; opt.textContent = label;
+      sel.appendChild(opt);
+    });
+  }
+  toSel.value = 23;
+})();
+
+function getCheckedHours() {
+  return [...document.querySelectorAll("#hourGrid input:checked")].map(i => Number(i.value));
+}
+
+function setCheckedHours(hours) {
+  const set = new Set(hours);
+  document.querySelectorAll("#hourGrid .hour-cell").forEach(cell => {
+    const h = Number(cell.dataset.hour);
+    const cb = cell.querySelector("input");
+    cb.checked = set.has(h);
+    cell.classList.toggle("checked", set.has(h));
+  });
+}
+
+document.getElementById("hoursSelectAll").addEventListener("click", () => setCheckedHours([...Array(24).keys()]));
+document.getElementById("hoursDeselectAll").addEventListener("click", () => setCheckedHours([]));
+
+document.getElementById("rangeMarkAvail").addEventListener("click", () => {
+  const from = Number(document.getElementById("rangeFrom").value);
+  const to   = Number(document.getElementById("rangeTo").value);
+  if (from > to) { availStatus("'From' must be before 'To'.", "err"); return; }
+  const current = new Set(getCheckedHours());
+  for (let h = from; h <= to; h++) current.add(h);
+  setCheckedHours([...current]);
+});
+
+document.getElementById("rangeMarkUnavail").addEventListener("click", () => {
+  const from = Number(document.getElementById("rangeFrom").value);
+  const to   = Number(document.getElementById("rangeTo").value);
+  if (from > to) { availStatus("'From' must be before 'To'.", "err"); return; }
+  const current = new Set(getCheckedHours());
+  for (let h = from; h <= to; h++) current.delete(h);
+  setCheckedHours([...current]);
+});
+
+document.getElementById("hourOverrideLoad").addEventListener("click", () => {
+  const date = document.getElementById("hourOverrideDate").value;
+  if (!date) { availStatus("Pick a date first.", "err"); return; }
+  const existing = currentHourOverrides[date];
+  if (existing) {
+    setCheckedHours(existing);
+  } else {
+    // Default to global open/close window
+    const open  = Number(document.getElementById("availOpenHour").value)  || 8;
+    const close = Number(document.getElementById("availCloseHour").value) || 20;
+    setCheckedHours([...Array(close - open).keys()].map(i => i + open));
+  }
+  document.getElementById("hourOverridePanel").style.display = "block";
+});
+
+document.getElementById("hourOverrideSave").addEventListener("click", async () => {
+  const date = document.getElementById("hourOverrideDate").value;
+  if (!date) { availStatus("Pick a date first.", "err"); return; }
+  const hours = getCheckedHours().sort((a, b) => a - b);
+  const updated = { ...currentHourOverrides, [date]: hours };
+  await saveHourOverrides(updated);
+});
+
+document.getElementById("hourOverrideClear").addEventListener("click", async () => {
+  const date = document.getElementById("hourOverrideDate").value;
+  if (!date) { availStatus("Pick a date first.", "err"); return; }
+  const updated = { ...currentHourOverrides };
+  delete updated[date];
+  await saveHourOverrides(updated);
+  document.getElementById("hourOverridePanel").style.display = "none";
+});
+
+async function saveHourOverrides(overrides) {
+  const btn = document.getElementById("hourOverrideSave");
+  btn.disabled = true; btn.textContent = "Saving…";
+  try {
+    const res  = await fetch("/api/admin/settings", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
+      body:    JSON.stringify({ hour_overrides: overrides }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      currentHourOverrides = overrides;
+      availStatus("Hour override saved.", "ok");
+      document.getElementById("availLastSaved").textContent = "Saved " + new Date().toLocaleTimeString();
+    } else {
+      availStatus(data.error || "Save failed.", "err");
+    }
+  } catch(e) {
+    availStatus("Network error.", "err");
+  } finally {
+    btn.disabled = false; btn.textContent = "Save Hours for this Date";
+  }
+}
 
 document.getElementById("blockAddBtn").addEventListener("click", async () => {
   const input = document.getElementById("blockDateInput");

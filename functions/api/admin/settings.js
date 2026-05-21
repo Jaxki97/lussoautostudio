@@ -29,9 +29,10 @@ async function getSettings(db) {
   ).all();
   const map = Object.fromEntries(results.map(r => [r.key, r.value]));
   return {
-    open_hour:     parseInt(map.open_hour     ?? "8",  10),
-    close_hour:    parseInt(map.close_hour    ?? "20", 10),
-    blocked_dates: JSON.parse(map.blocked_dates ?? "[]"),
+    open_hour:      parseInt(map.open_hour     ?? "8",  10),
+    close_hour:     parseInt(map.close_hour    ?? "20", 10),
+    blocked_dates:  JSON.parse(map.blocked_dates  ?? "[]"),
+    hour_overrides: JSON.parse(map.hour_overrides ?? "{}"),
   };
 }
 
@@ -85,6 +86,21 @@ export async function onRequest({ request, env }) {
         return json({ ok: false, error: "blocked_dates entries must be YYYY-MM-DD strings" }, 400);
       }
       updates.push(["blocked_dates", JSON.stringify(body.blocked_dates)]);
+    }
+
+    if (body.hour_overrides !== undefined) {
+      if (typeof body.hour_overrides !== "object" || Array.isArray(body.hour_overrides)) {
+        return json({ ok: false, error: "hour_overrides must be an object" }, 400);
+      }
+      const valid = Object.entries(body.hour_overrides).every(([date, hours]) =>
+        /^\d{4}-\d{2}-\d{2}$/.test(date) &&
+        Array.isArray(hours) &&
+        hours.every(h => Number.isInteger(h) && h >= 0 && h <= 23)
+      );
+      if (!valid) {
+        return json({ ok: false, error: "hour_overrides must be { YYYY-MM-DD: [0-23, ...] }" }, 400);
+      }
+      updates.push(["hour_overrides", JSON.stringify(body.hour_overrides)]);
     }
 
     if (updates.length === 0) {

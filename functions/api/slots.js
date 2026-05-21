@@ -111,10 +111,11 @@ export async function onRequestGet({ request, env }) {
     return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
   }
 
-  // ── Resolve open/close hours from settings ──────────────────────────────────
-  const settingsMap = Object.fromEntries(settingsResults.map(r => [r.key, r.value]));
-  const OPEN_HOUR   = parseInt(settingsMap.open_hour  ?? String(DEFAULT_OPEN_HOUR),  10);
-  const CLOSE_HOUR  = parseInt(settingsMap.close_hour ?? String(DEFAULT_CLOSE_HOUR), 10);
+  // ── Resolve settings ────────────────────────────────────────────────────────
+  const settingsMap  = Object.fromEntries(settingsResults.map(r => [r.key, r.value]));
+  const OPEN_HOUR    = parseInt(settingsMap.open_hour  ?? String(DEFAULT_OPEN_HOUR),  10);
+  const CLOSE_HOUR   = parseInt(settingsMap.close_hour ?? String(DEFAULT_CLOSE_HOUR), 10);
+  const hourOverrides = JSON.parse(settingsMap.hour_overrides ?? "{}");
 
   // ── Blocked-date check ──────────────────────────────────────────────────────
   const blockedDates = JSON.parse(settingsMap.blocked_dates ?? "[]");
@@ -123,8 +124,6 @@ export async function onRequestGet({ request, env }) {
   }
 
   // ── Build a set of all occupied hours ──────────────────────────────────────
-  // For each existing booking [start_hour, end_hour), mark every integer hour
-  // in that range as occupied. e.g. booking 13–17 → occupies {13,14,15,16}.
   const occupiedHours = new Set();
   for (const { start_hour, end_hour } of existingBookings) {
     for (let h = start_hour; h < end_hour; h++) {
@@ -133,27 +132,44 @@ export async function onRequestGet({ request, env }) {
   }
 
   // ── Build slot list ─────────────────────────────────────────────────────────
-  // Show every hour from OPEN to CLOSE as a potential start time.
-  // A slot is "booked" if that specific hour is occupied by an existing booking.
-  // Slots where the duration would run past closing are excluded silently.
   const slots = [];
-  for (let h = OPEN_HOUR; h < CLOSE_HOUR; h++) {
-    const end = h + duration_hours;
-    const isOccupied = occupiedHours.has(h);
-    const fitsBeforeClose = end <= CLOSE_HOUR;
+  const dateOverride = hourOverrides[date]; // array of available hours, or undefined
 
-    // Drop unselectable free slots at end of day (e.g. 8 PM start for 4hr service)
-    if (!fitsBeforeClose && !isOccupied) continue;
-
-    slots.push({
-      start_hour: h,
-      end_hour:   end,
-      label:      formatHour(h),
-      end_label:  formatHour(Math.min(end, CLOSE_HOUR)),
-      // Occupied hours grey out. Hours that don't fit the duration also grey
-      // so the grid looks complete near closing time.
-      status: (isOccupied || !fitsBeforeClose) ? "booked" : "available",
-    });
+  if (dateOverride) {
+    // Per-date override: only the chosen hours are available
+    const availableSet = new Set(dateOverride);
+    const sorted = [...availableSet].sort((a, b) => a - b);
+    for (const h of sorted) {
+      const end = h + duration_hours;
+      const isOccupied = occupiedHours.has(h);
+      // Full service duration must fall within available hours
+      let durationFits = true;
+      for (let hh = h; hh < end; hh++) {
+        if (!availableSet.has(hh)) { durationFits = false; break; }
+      }
+      slots.push({
+        start_hour: h,
+        end_hour:   end,
+        label:      formatHour(h),
+        end_label:  formatHour(end),
+        status: (isOccupied || !durationFits) ? "booked" : "available",
+      });
+    }
+  } else {
+    // Default: use global open/close window
+    for (let h = OPEN_HOUR; h < CLOSE_HOUR; h++) {
+      const end = h + duration_hours;
+      const isOccupied = occupiedHours.has(h);
+      const fitsBeforeClose = end <= CLOSE_HOUR;
+      if (!fitsBeforeClose && !isOccupied) continue;
+      slots.push({
+        start_hour: h,
+        end_hour:   end,
+        label:      formatHour(h),
+        end_label:  formatHour(Math.min(end, CLOSE_HOUR)),
+        status: (isOccupied || !fitsBeforeClose) ? "booked" : "available",
+      });
+    }
   }
 
   return json({ ok: true, slots, date, duration_hours, open_hour: OPEN_HOUR, close_hour: CLOSE_HOUR }, 200);
