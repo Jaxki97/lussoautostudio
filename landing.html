@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <link rel="canonical" href="https://lussoautostudio.ca/landing">
+  <title>Mobile Car Detailing in Kitchener, Waterloo &amp; Cambridge | Lusso Auto Studio</title>
+  <meta name="description" content="Appointment-only mobile auto detailing at your home in Kitchener, Waterloo & Cambridge. Interior deep cleans from $150, full details from $230, and a monthly maintenance membership. Join the founding client list — no obligation." />
+  <meta name="theme-color" content="#0b0b0c" />
+
+  <meta property="og:site_name" content="Lusso Auto Studio" />
+  <meta property="og:title" content="Mobile Car Detailing in Kitchener, Waterloo & Cambridge — Lusso Auto Studio" />
+  <meta property="og:description" content="Quiet, precise auto care, brought to your driveway. The founding client list is now open — no obligation." />
+  <meta property="og:url" content="https://lussoautostudio.ca/landing" />
+  <meta property="og:image" content="https://lussoautostudio.ca/logo-small.png" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="en_CA" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Mobile Car Detailing in Kitchener, Waterloo & Cambridge — Lusso Auto Studio" />
+  <meta name="twitter:description" content="Quiet, precise auto care, brought to your driveway. The founding client list is now open — no obligation." />
+  <meta name="twitter:image" content="https://lussoautostudio.ca/logo-small.png" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "Lusso Auto Studio",
+    "description": "Private, appointment-only mobile auto detailing serving Kitchener, Waterloo, and Cambridge, Ontario. Interior deep cleans, full details, and a biweekly maintenance membership — at your home.",
+    "url": "https://lussoautostudio.ca",
+    "image": "https://lussoautostudio.ca/logo-small.png",
+    "priceRange": "$$",
+    "areaServed": [
+      {"@type": "City", "name": "Kitchener"},
+      {"@type": "City", "name": "Waterloo"},
+      {"@type": "City", "name": "Cambridge"}
+    ],
+    "sameAs": ["https://instagram.com/lussoautostudio"],
+    "makesOffer": [
+      {
+        "@type": "Offer",
+        "itemOffered": {"@type": "Service", "name": "Interior Deep Clean", "serviceType": "Mobile Auto Detailing"},
+        "priceSpecification": {"@type": "PriceSpecification", "price": "150", "priceCurrency": "CAD", "minPrice": "150"}
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {"@type": "Service", "name": "Full Detail", "serviceType": "Mobile Auto Detailing"},
+        "priceSpecification": {"@type": "PriceSpecification", "price": "230", "priceCurrency": "CAD", "minPrice": "230"}
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {"@type": "Service", "name": "Maintenance Membership (biweekly visits)", "serviceType": "Mobile Auto Detailing"},
+        "priceSpecification": {"@type": "UnitPriceSpecification", "price": "200", "priceCurrency": "CAD", "unitText": "per month"}
+      }
+    ]
+  }
+  </script>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root{
+      --bg:#0b0b0c;
+      --bg2:#111216;
+      --card:rgba(255,255,255,.06);
+      --line:rgba(255,255,255,.08);
+      --line2:rgba(199,167,106,.22);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --muted2:rgba(255,255,255,.55);
+      --gold:#c7a76a;
+      --gold2:#b89455;
+      --shadow:0 14px 50px rgba(0,0,0,.55);
+      --radius:22px;
+      --max:880px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      overflow-x:hidden;
+    }
+    @media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} }
+
+    .bg-glow{
+      position:fixed; inset:0; pointer-events:none; z-index:0;
+      background:
+        radial-gradient(560px circle at 50% 8%, rgba(199,167,106,.12), rgba(11,11,12,0) 60%),
+        radial-gradient(620px circle at 105% 90%, rgba(255,255,255,.05), rgba(11,11,12,0) 60%);
+    }
+
+    .wrap{max-width:var(--max); margin:0 auto; padding:0 20px; position:relative; z-index:2}
+
+    header{
+      border-bottom:1px solid rgba(255,255,255,.06);
+      background:rgba(11,11,12,.72);
+      backdrop-filter: blur(10px);
+      position:sticky; top:0; z-index:50;
+    }
+    .row{display:flex; align-items:center; justify-content:space-between; gap:14px; padding:12px 0}
+    .brand-logo{height:44px; width:auto; display:block}
+
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center; gap:10px;
+      border-radius:999px;
+      padding:13px 22px;
+      text-decoration:none;
+      font-weight:650;
+      font-size:15px;
+      letter-spacing:.01em;
+      border:1px solid transparent;
+      cursor:pointer;
+      transition:transform .15s ease, opacity .15s ease, background .2s ease;
+    }
+    .btn:active{transform:scale(.99)}
+    .btn-gold{background:var(--gold); color:#0b0b0c}
+    .btn-gold:hover{opacity:.92}
+    .btn-ghost{background:rgba(255,255,255,.06); border-color:var(--line2); color:var(--text)}
+    .btn-ghost:hover{background:rgba(255,255,255,.10)}
+    .btn-sm{padding:10px 16px; font-size:13px}
+
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      border-radius:999px;
+      padding:8px 14px;
+      background:linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow:0 0 0 1px var(--line2) inset;
+      color:var(--muted);
+      font-size:12px;
+      letter-spacing:.04em;
+    }
+    .dot{width:6px; height:6px; border-radius:99px; background:var(--gold)}
+
+    .hero{padding:64px 0 48px; text-align:center}
+    @media(min-width:780px){ .hero{padding:92px 0 64px} }
+
+    h1{
+      font-family:"Cormorant Garamond", serif;
+      font-weight:600;
+      letter-spacing:.02em;
+      font-size: clamp(2.2rem, 7vw, 3.8rem);
+      line-height:1.06;
+      margin:20px auto 0;
+      max-width:18ch;
+    }
+    .gold{color:var(--gold)}
+    .lead{
+      margin:18px auto 0;
+      font-size: clamp(1.02rem, 2.2vw, 1.16rem);
+      line-height:1.7;
+      color:var(--muted);
+      max-width: 56ch;
+    }
+    .actions{margin-top:26px; display:flex; flex-direction:column; gap:10px; align-items:center; justify-content:center}
+    @media(min-width:520px){ .actions{flex-direction:row} }
+    .micro{margin-top:14px; font-size:12px; color:var(--muted2); letter-spacing:.04em}
+
+    section{position:relative; z-index:2}
+    .section{padding:52px 0; border-top:1px solid rgba(255,255,255,.06)}
+    @media(min-width:780px){ .section{padding:64px 0} }
+
+    .eyebrow{
+      font-size:11px; letter-spacing:.3em; text-transform:uppercase;
+      color:var(--gold); opacity:.85;
+    }
+    h2{
+      font-family:"Cormorant Garamond", serif;
+      font-weight:600;
+      letter-spacing:.01em;
+      font-size: clamp(1.7rem, 4.4vw, 2.4rem);
+      line-height:1.12;
+      margin:12px 0 0;
+    }
+    .subtext{margin:12px 0 0; color:var(--muted); line-height:1.7; max-width:60ch}
+
+    .principles{margin-top:26px; display:grid; gap:12px}
+    @media(min-width:780px){ .principles{grid-template-columns:repeat(3,1fr); gap:14px} }
+    .principle{
+      border-radius:18px;
+      padding:18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow:0 0 0 1px rgba(255,255,255,.06) inset;
+    }
+    .principle small{
+      display:block; font-size:11px; letter-spacing:.25em; text-transform:uppercase; color:var(--muted2);
+    }
+    .principle p{margin:8px 0 0; color:var(--muted); line-height:1.6; font-size:14px}
+    .principle b{color:var(--text)}
+
+    .offers{margin-top:26px; display:grid; gap:12px}
+    @media(min-width:780px){ .offers{grid-template-columns:repeat(3,1fr); gap:14px} }
+    .offer{
+      border-radius:var(--radius);
+      padding:20px;
+      background:var(--bg2);
+      box-shadow:0 0 0 1px rgba(255,255,255,.07) inset, var(--shadow);
+      display:flex; flex-direction:column;
+    }
+    .offer.feature{box-shadow:0 0 0 1px var(--line2) inset, var(--shadow)}
+    .offer h3{
+      margin:0;
+      font-family:"Cormorant Garamond", serif;
+      font-size:23px; font-weight:600; letter-spacing:.01em;
+    }
+    .offer p{margin:10px 0 0; color:var(--muted); line-height:1.6; font-size:14px; flex:1}
+    .price-row{
+      margin-top:16px; padding-top:14px;
+      border-top:1px solid rgba(255,255,255,.08);
+      display:flex; align-items:baseline; justify-content:space-between;
+      color:var(--muted2); font-size:12px; letter-spacing:.06em;
+    }
+    .price-row b{color:var(--gold); font-size:17px; letter-spacing:.01em}
+
+    .steps{margin-top:26px; display:grid; gap:12px}
+    @media(min-width:780px){ .steps{grid-template-columns:repeat(3,1fr); gap:14px} }
+    .step{
+      border-radius:18px; padding:18px;
+      background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+      box-shadow:0 0 0 1px rgba(255,255,255,.06) inset;
+    }
+    .step .num{
+      font-family:"Cormorant Garamond", serif;
+      font-size:26px; color:var(--gold); line-height:1;
+    }
+    .step h3{margin:10px 0 0; font-size:15px; font-weight:650; letter-spacing:.01em}
+    .step p{margin:8px 0 0; color:var(--muted); line-height:1.6; font-size:14px}
+
+    .form-card{
+      margin-top:26px;
+      border-radius:var(--radius);
+      background:var(--bg2);
+      box-shadow:0 0 0 1px var(--line2) inset, var(--shadow);
+      padding:24px;
+    }
+    @media(min-width:780px){ .form-card{padding:32px} }
+
+    .grid2{display:grid; gap:14px}
+    @media(min-width:640px){ .grid2{grid-template-columns:1fr 1fr} }
+    .field{display:flex; flex-direction:column; gap:7px}
+    .field label{font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--muted2)}
+    .field input, .field select{
+      appearance:none;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
+      color:var(--text);
+      padding:13px 14px;
+      font-size:15px;
+      font-family:inherit;
+      outline:none;
+      transition:border-color .2s ease, background .2s ease;
+      width:100%;
+    }
+    .field input:focus, .field select:focus{border-color:var(--line2); background:rgba(255,255,255,.06)}
+    .field select{
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%23c7a76a' stroke-width='1.6'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;
+      background-position:right 14px center;
+      padding-right:38px;
+    }
+    .hp{position:absolute; left:-9999px; opacity:0; height:0; overflow:hidden}
+
+    .form-foot{margin-top:18px; display:flex; flex-direction:column; gap:12px; align-items:flex-start}
+    .form-note{font-size:12px; color:var(--muted2); letter-spacing:.03em; line-height:1.6}
+    .form-error{display:none; color:#e09a9a; font-size:13px; margin-top:4px}
+
+    .thanks{
+      display:none;
+      text-align:center;
+      padding:28px 10px;
+    }
+    .thanks .mark{
+      width:52px; height:52px; margin:0 auto;
+      border-radius:999px;
+      display:grid; place-items:center;
+      background:linear-gradient(180deg, rgba(199,167,106,.18), rgba(199,167,106,.06));
+      box-shadow:0 0 0 1px var(--line2) inset;
+      color:var(--gold); font-size:22px;
+      font-family:"Cormorant Garamond", serif;
+    }
+    .thanks h3{
+      margin:16px 0 0;
+      font-family:"Cormorant Garamond", serif;
+      font-size:26px; font-weight:600;
+    }
+    .thanks p{margin:10px auto 0; color:var(--muted); line-height:1.7; max-width:44ch}
+
+    footer{
+      border-top:1px solid rgba(255,255,255,.06);
+      padding:34px 0 44px;
+      text-align:center;
+    }
+    footer img{height:48px; width:auto; opacity:.9}
+    footer p{margin:12px 0 0; color:var(--muted2); font-size:12px; letter-spacing:.08em}
+    footer a{color:var(--muted); text-decoration:none}
+    footer a:hover{color:var(--gold)}
+  </style>
+</head>
+<body>
+  <div class="bg-glow"></div>
+
+  <header>
+    <div class="wrap">
+      <div class="row">
+        <img src="logo-small.png" alt="Lusso Auto Studio" class="brand-logo" />
+        <a class="btn btn-gold btn-sm" href="#join">Request Invitation</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="wrap">
+        <div class="pill"><span class="dot"></span> Founding client list now open · Kitchener – Waterloo – Cambridge</div>
+
+        <h1>Your vehicle, kept <span class="gold">Quietly Immaculate.</span></h1>
+
+        <p class="lead">
+          Lusso Auto Studio is a private, appointment-only detailing service.
+          We come to your home, work on one vehicle at a time, and finish to a
+          standard most car washes don't attempt.
+        </p>
+
+        <div class="actions">
+          <a class="btn btn-gold" href="#join">Request an invitation</a>
+          <a class="btn btn-ghost" href="#standard">Learn our standard</a>
+        </div>
+
+        <p class="micro">No payment. No obligation. A personal reply — not a mailing list.</p>
+      </div>
+    </section>
+
+    <section id="standard" class="section">
+      <div class="wrap">
+        <div class="eyebrow">The Lusso standard</div>
+        <h2>We don't do volume. We do it properly.</h2>
+        <p class="subtext">
+          Most detailing is built around speed — how many cars fit in a day.
+          Ours is built around the finish. That difference is visible every time
+          you walk up to your car.
+        </p>
+
+        <div class="principles">
+          <div class="principle">
+            <small>Private</small>
+            <p><b>One vehicle at a time.</b> Your appointment is yours alone — never rushed against the next job.</p>
+          </div>
+          <div class="principle">
+            <small>Mobile</small>
+            <p><b>At your home.</b> Your driveway, your schedule. You never sit in a waiting room.</p>
+          </div>
+          <div class="principle">
+            <small>Considered</small>
+            <p><b>Process over shortcuts.</b> Products and methods chosen for the finish, not the clock. Fully insured.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="eyebrow">What we offer</div>
+        <h2>Three ways to experience it.</h2>
+        <p class="subtext">Transparent starting prices. Final quote confirmed before any appointment.</p>
+
+        <div class="offers">
+          <div class="offer">
+            <h3>Interior Deep Clean</h3>
+            <p>A full interior reset — vacuum and blow-out, touch-point steam, leather and plastics care, interior glass.</p>
+            <div class="price-row"><span>STARTING FROM</span><b>$150</b></div>
+          </div>
+
+          <div class="offer feature">
+            <h3>Full Detail</h3>
+            <p>The complete treatment — interior deep clean plus a safe hand wash, wheels and tires, and a refined sealant finish.</p>
+            <div class="price-row"><span>STARTING FROM</span><b>$230</b></div>
+          </div>
+
+          <div class="offer">
+            <h3>Maintenance Membership</h3>
+            <p>Biweekly visits, so your vehicle simply stays ready — no rebooking, no reminders. Limited roster, by invitation.</p>
+            <div class="price-row"><span>PER MONTH</span><b>$200</b></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <div class="eyebrow">How it works</div>
+        <h2>Three quiet steps.</h2>
+
+        <div class="steps">
+          <div class="step">
+            <div class="num">01</div>
+            <h3>Request your invitation</h3>
+            <p>Thirty seconds. No payment details, no commitment — just tell us what interests you.</p>
+          </div>
+          <div class="step">
+            <div class="num">02</div>
+            <h3>A personal reply</h3>
+            <p>We reach out within a day to understand your vehicle and what "done properly" means to you.</p>
+          </div>
+          <div class="step">
+            <div class="num">03</div>
+            <h3>Your first appointment</h3>
+            <p>Founding-list clients are scheduled first as appointments open — at your home, on your time.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="join" class="section">
+      <div class="wrap">
+        <div class="eyebrow">Founding list</div>
+        <h2>The founding list is open.</h2>
+        <p class="subtext">
+          We're accepting a limited first roster across Kitchener, Waterloo, and Cambridge.
+          Joining costs nothing and commits you to nothing — it simply places you first
+          when appointments open.
+        </p>
+
+        <div class="form-card">
+          <form id="interestForm" novalidate>
+            <div class="grid2">
+              <div class="field">
+                <label for="f-name">Name</label>
+                <input id="f-name" name="name" type="text" autocomplete="name" required maxlength="120" placeholder="Your name" />
+              </div>
+              <div class="field">
+                <label for="f-email">Email</label>
+                <input id="f-email" name="email" type="email" autocomplete="email" required maxlength="160" placeholder="you@example.com" />
+              </div>
+              <div class="field">
+                <label for="f-phone">Phone</label>
+                <input id="f-phone" name="phone" type="tel" autocomplete="tel" required maxlength="30" placeholder="(519) 000-0000" />
+              </div>
+              <div class="field">
+                <label for="f-city">City</label>
+                <select id="f-city" name="city" required>
+                  <option value="" disabled selected>Select your city</option>
+                  <option>Kitchener</option>
+                  <option>Waterloo</option>
+                  <option>Cambridge</option>
+                  <option>Other / nearby</option>
+                </select>
+              </div>
+              <div class="field" style="grid-column:1 / -1">
+                <label for="f-interest">What interests you most?</label>
+                <select id="f-interest" name="interest" required>
+                  <option value="" disabled selected>Choose one</option>
+                  <option>Interior Deep Clean — from $150</option>
+                  <option>Full Detail — from $230</option>
+                  <option>Maintenance Membership — $200/mo</option>
+                  <option>Just curious for now</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- honeypot -->
+            <div class="hp" aria-hidden="true">
+              <label>Company<input name="company" tabindex="-1" autocomplete="off" /></label>
+            </div>
+
+            <div class="form-foot">
+              <button class="btn btn-gold" type="submit" id="joinBtn">Request my invitation →</button>
+              <div class="form-error" id="formError"></div>
+              <p class="form-note">
+                No spam, no pressure — one personal reply, and priority access when appointments open.
+              </p>
+            </div>
+          </form>
+
+          <div class="thanks" id="thanksBox">
+            <div class="mark">L</div>
+            <h3>You're on the list.</h3>
+            <p>
+              Thank you — your place on the founding list is reserved.
+              Expect a personal reply within a day. No newsletters, no noise.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <img src="logo-small.png" alt="Lusso Auto Studio" />
+      <p>LUSSO AUTO STUDIO · KITCHENER – WATERLOO – CAMBRIDGE</p>
+      <p><a href="https://instagram.com/lussoautostudio" rel="noopener" target="_blank">@lussoautostudio</a></p>
+    </div>
+  </footer>
+
+  <script>
+    (function () {
+      const form    = document.getElementById("interestForm");
+      const btn     = document.getElementById("joinBtn");
+      const errBox  = document.getElementById("formError");
+      const thanks  = document.getElementById("thanksBox");
+
+      // Capture ad attribution (utm params or anything else in the URL)
+      const source = (location.search ? location.search.slice(1) : "") || (document.referrer ? "ref:" + document.referrer : "direct");
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errBox.style.display = "none";
+
+        const data = {
+          name:     form.name.value.trim(),
+          email:    form.email.value.trim(),
+          phone:    form.phone.value.trim(),
+          city:     form.city.value,
+          interest: form.interest.value,
+          company:  form.company.value, // honeypot
+          source:   source.slice(0, 300),
+        };
+
+        if (!data.name || !data.email || !data.phone || !data.city || !data.interest) {
+          errBox.textContent = "Please fill in your name, email, phone, city, and what interests you.";
+          errBox.style.display = "block";
+          return;
+        }
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) {
+          errBox.textContent = "That email address doesn't look right — mind double-checking it?";
+          errBox.style.display = "block";
+          return;
+        }
+        if (!/^[\d\s\(\)\+\-\.]{7,20}$/.test(data.phone)) {
+          errBox.textContent = "That phone number doesn't look right — mind double-checking it?";
+          errBox.style.display = "block";
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Reserving your place…";
+
+        try {
+          const res = await fetch("/api/interest", {
+            method: "POST",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(data),
+          });
+          const out = await res.json().catch(() => ({}));
+          if (!res.ok || !out.ok) throw new Error(out.error || "Request failed");
+
+          form.style.display = "none";
+          thanks.style.display = "block";
+          thanks.scrollIntoView({ behavior: "smooth", block: "center" });
+        } catch (err) {
+          errBox.textContent = "Something went wrong on our end. Please try again in a moment.";
+          errBox.style.display = "block";
+          btn.disabled = false;
+          btn.textContent = "Request my invitation →";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

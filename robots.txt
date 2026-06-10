@@ -1,3 +1,38 @@
+# Default — all crawlers welcome except private areas
 User-agent: *
 Disallow: /admin
 Disallow: /api/
+
+# AI assistants & their search crawlers — explicitly welcome
+# OpenAI (ChatGPT)
+User-agent: GPTBot
+Disallow: /admin
+Disallow: /api/
+
+User-agent: OAI-SearchBot
+Disallow: /admin
+Disallow: /api/
+
+User-agent: ChatGPT-User
+Disallow: /admin
+Disallow: /api/
+
+# Anthropic (Claude)
+User-agent: ClaudeBot
+Disallow: /admin
+Disallow: /api/
+
+User-agent: Claude-SearchBot
+Disallow: /admin
+Disallow: /api/
+
+User-agent: Claude-User
+Disallow: /admin
+Disallow: /api/
+
+# Perplexity
+User-agent: PerplexityBot
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://lussoautostudio.ca/sitemap.xml
