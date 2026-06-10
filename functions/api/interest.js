@@ -131,7 +131,7 @@ async function sendOwnerEmail(lead, env) {
       body: JSON.stringify({
         from,
         to:      [env.NOTIFY_EMAIL],
-        subject: `✦ Founding-List Signup — ${lead.name} (${lead.interest})`,
+        subject: `Founding-List Signup — ${lead.name} (${lead.interest})`,
         html,
       }),
     });
