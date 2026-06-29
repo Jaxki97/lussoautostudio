@@ -394,28 +394,34 @@
     .three{display:grid; gap:10px}
     @media(min-width:640px){ .three{grid-template-columns:repeat(3, minmax(0,1fr))} }
 
-    .addon-checks{display:flex; gap:12px; flex-wrap:wrap; margin-top:8px}
+    .addon-checks{display:flex; gap:10px; flex-wrap:wrap; margin-top:8px}
     .addon-check{
-      display:flex; align-items:center; gap:8px;
+      display:flex; align-items:center; gap:7px;
       font-size:13px; color:var(--muted);
       cursor:pointer; user-select:none;
       margin-top:0;
       background:rgba(255,255,255,.04);
       border:1px solid rgba(255,255,255,.08);
       border-radius:999px;
-      padding:8px 14px;
-      transition:background .2s ease, border-color .2s ease;
+      padding:9px 16px;
+      transition:background .2s ease, border-color .2s ease, color .2s ease;
     }
-    .addon-check:hover{background:rgba(255,255,255,.07); border-color:rgba(199,167,106,.22)}
+    .addon-check:hover{background:rgba(255,255,255,.07); border-color:rgba(199,167,106,.30)}
+    .addon-check.active{
+      background:rgba(199,167,106,.10);
+      border-color:rgba(199,167,106,.50);
+      color:var(--text);
+    }
     .addon-check input[type="checkbox"]{
-      width:15px; height:15px;
-      margin-top:0; padding:0;
-      border-radius:4px;
-      border:none;
-      flex-shrink:0;
-      cursor:pointer;
-      accent-color:var(--gold);
+      position:absolute; opacity:0; pointer-events:none; width:0; height:0;
     }
+    .addon-check-dot{
+      width:7px; height:7px; border-radius:99px;
+      background:rgba(255,255,255,.20);
+      flex-shrink:0;
+      transition:background .2s ease;
+    }
+    .addon-check.active .addon-check-dot{ background:var(--gold) }
 
     .estimate-box{
       border-radius:18px;
@@ -1200,12 +1206,14 @@
               <div>
                 <label>Add-ons</label>
                 <div class="addon-checks">
-                  <label class="addon-check">
+                  <label class="addon-check" id="lbl_petHair">
                     <input type="checkbox" id="bk_petHair" />
+                    <span class="addon-check-dot"></span>
                     Pet Hair Removal <span style="color:var(--gold);margin-left:3px">+$50</span>
                   </label>
-                  <label class="addon-check">
+                  <label class="addon-check" id="lbl_odour">
                     <input type="checkbox" id="bk_odour" />
+                    <span class="addon-check-dot"></span>
                     Odour Treatment <span style="color:var(--gold);margin-left:3px">+$60</span>
                   </label>
                 </div>
@@ -1769,9 +1777,16 @@
         estimateBox.classList.add("visible");
       }
 
+      const lblPetHair = document.getElementById("lbl_petHair");
+      const lblOdour   = document.getElementById("lbl_odour");
+
+      function syncAddonPill(checkbox, label){
+        label.classList.toggle("active", checkbox.checked);
+      }
+
       vehicleEl.addEventListener("change",  updateEstimate);
-      petHairEl.addEventListener("change",  updateEstimate);
-      odourEl.addEventListener("change",    updateEstimate);
+      petHairEl.addEventListener("change",  () => { syncAddonPill(petHairEl, lblPetHair); updateEstimate(); });
+      odourEl.addEventListener("change",    () => { syncAddonPill(odourEl,   lblOdour);   updateEstimate(); });
 
       // ── Init ─────────────────────────────────────────────────────────────────
 
