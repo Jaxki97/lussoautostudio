@@ -350,6 +350,24 @@
     .shot img{width:100%; height:auto; display:block; aspect-ratio: 4 / 3; object-fit:cover}
     .shot div{padding:12px; color:var(--muted); font-size:14px}
 
+    /* ── Before / After hover reveal ───────────────────────────────────────── */
+    .shot-media{ position:relative; overflow:hidden; }
+    .shot-media .img-after{
+      position:absolute; inset:0; z-index:2;
+      width:100%; height:100%; aspect-ratio:unset;
+      opacity:0;
+      transition:opacity .65s ease;
+    }
+    .shot:hover .img-after{ opacity:1 }
+    .shot-hint{
+      position:absolute; bottom:10px; left:12px; z-index:3;
+      font-size:10px; letter-spacing:.20em; text-transform:uppercase;
+      color:rgba(255,255,255,.65);
+      transition:opacity .4s ease;
+      pointer-events:none;
+    }
+    .shot:hover .shot-hint{ opacity:0 }
+
     form{margin-top:10px}
     label{display:block; font-size:13px; color:var(--muted); margin-top:12px}
     input, select, textarea{
@@ -670,7 +688,7 @@
         <nav aria-label="Primary">
           <a href="#services">Services</a>
           <a href="#membership">Membership</a>
-          <a href="#results">Results</a>
+          <a href="#results">What to Expect</a>
           <a href="#book">Book</a>
           <a class="btn btn-gold btn-sm" href="#apply">Request Access →</a>
         </nav>
@@ -822,27 +840,49 @@
     <section id="results" class="section" style="border-top:1px solid rgba(255,255,255,.06);">
       <div class="wrap">
         <div class="section-top">
-          <div class="eyebrow">Results</div>
+          <div class="eyebrow">What to Expect</div>
           <h2>Quiet transformations.</h2>
-          <p class="subtext">Replace these placeholders with your real before/after shots. Elite clients respond to clarity, not hype.</p>
+          <p class="subtext">Hover each card to reveal the after. Every session, every vehicle.</p>
         </div>
 
         <div class="gallery">
+
+          <!-- Card 1: Interior -->
           <div class="shot">
-            <img src="https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?auto=format&fit=crop&w=1200&q=70"
-                 alt="Detailing result 1" loading="lazy" decoding="async" />
+            <div class="shot-media">
+              <img loading="lazy" decoding="async" alt="Interior before detailing"
+                src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?auto=format&fit=crop&w=1200&q=70" />
+              <img class="img-after" loading="lazy" decoding="async" alt="Interior after detailing"
+                src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?auto=format&fit=crop&w=1200&q=70" />
+              <span class="shot-hint">Hover to reveal</span>
+            </div>
             <div>Interior reset • Touch points</div>
           </div>
+
+          <!-- Card 2: Exterior wash -->
           <div class="shot">
-            <img src="https://images.unsplash.com/photo-1511919884226-fd3cad34687c?auto=format&fit=crop&w=1200&q=70"
-                 alt="Detailing result 2" loading="lazy" decoding="async" />
+            <div class="shot-media">
+              <img loading="lazy" decoding="async" alt="Exterior before detailing"
+                src="https://images.unsplash.com/photo-1519003722824-194d4455a60c?auto=format&fit=crop&w=1200&q=70" />
+              <img class="img-after" loading="lazy" decoding="async" alt="Exterior after detailing"
+                src="https://images.unsplash.com/photo-1525609004556-c46c7d6cf023?auto=format&fit=crop&w=1200&q=70" />
+              <span class="shot-hint">Hover to reveal</span>
+            </div>
             <div>Refined wash • Gloss finish</div>
           </div>
+
+          <!-- Card 3: Wheels -->
           <div class="shot">
-            <img src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=70"
-                 alt="Detailing result 3" loading="lazy" decoding="async" />
+            <div class="shot-media">
+              <img loading="lazy" decoding="async" alt="Wheels before detailing"
+                src="https://images.unsplash.com/photo-1568772585407-9361f9bf3a87?auto=format&fit=crop&w=1200&q=70" />
+              <img class="img-after" loading="lazy" decoding="async" alt="Wheels after detailing"
+                src="https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=70" />
+              <span class="shot-hint">Hover to reveal</span>
+            </div>
             <div>Wheels • Tire finish</div>
           </div>
+
         </div>
       </div>
     </section>
@@ -1367,7 +1407,7 @@
           <div class="foot-links">
             <a href="#services">Services</a>
             <a href="#membership">Membership</a>
-            <a href="#results">Results</a>
+            <a href="#results">What to Expect</a>
             <a href="#book">Book</a>
           </div>
         </div>
@@ -1810,6 +1850,7 @@
 
       clearSlots("Select service + date to view availability. Booked slots appear grey.");
     })();
+
   </script>
 </body>
 </html>
