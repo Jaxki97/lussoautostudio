@@ -43,8 +43,9 @@ export async function onRequestGet({ request, env }) {
   // ── Fetch bookings ───────────────────────────────────────────────────────────
   try {
     const { results } = await env.DB.prepare(
-      `SELECT id, date, start_hour, end_hour, duration_hours,
-              service, name, phone, vehicle, city, notes, status, created_at
+      `SELECT id, ref, date, start_hour, end_hour, duration_hours,
+              service, name, phone, email, vehicle, city, notes, status, created_at,
+              reschedule_count, deposit_status, event_log
          FROM bookings
         ORDER BY date DESC, start_hour ASC
         LIMIT 500`

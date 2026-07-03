@@ -8,6 +8,8 @@
 // Rate limiting: set a Cloudflare WAF rule for this endpoint (3 req/min per IP).
 // =============================================================================
 
+import { generateRef } from "../_shared.js";
+
 const CORS = {
   "access-control-allow-origin":  "https://lussoautostudio.ca",
   "access-control-allow-methods": "POST, OPTIONS",
@@ -81,16 +83,27 @@ export async function onRequestPost({ request, env }) {
     at:    created_at,
   }]);
 
-  try {
-    await env.DB.prepare(`
-      INSERT INTO membership_applications
-        (id, name, phone, vehicle, city, parking, preferred_start,
-         message, status, event_log, created_at)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?)
-    `).bind(id, name, phone, vehicle, city, parking, preferred_start,
-            message, event_log, created_at).run();
-  } catch (e) {
-    console.error("[membership/apply] DB error:", e?.message ?? e);
+  let ref = null;
+  let inserted = false;
+  for (let attempt = 0; attempt < 5 && !inserted; attempt++) {
+    ref = generateRef("M");
+    try {
+      await env.DB.prepare(`
+        INSERT INTO membership_applications
+          (id, name, phone, vehicle, city, parking, preferred_start,
+           message, status, event_log, created_at, ref)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)
+      `).bind(id, name, phone, vehicle, city, parking, preferred_start,
+              message, event_log, created_at, ref).run();
+      inserted = true;
+    } catch (e) {
+      const msg = String(e?.message ?? e);
+      if (msg.includes("UNIQUE") && msg.includes("ref")) continue;
+      console.error("[membership/apply] DB error:", msg);
+      return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
+    }
+  }
+  if (!inserted) {
     return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
   }
 

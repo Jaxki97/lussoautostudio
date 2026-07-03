@@ -9,6 +9,8 @@
 //                      onboarding address: onboarding@resend.dev for testing)
 // =============================================================================
 
+import { generateRef, getOrCreateManageToken, manageLink } from "./_shared.js";
+
 const CORS_HEADERS = {
   "access-control-allow-origin": "https://lussoautostudio.ca",
   "access-control-allow-methods": "POST, OPTIONS",
@@ -77,7 +79,7 @@ async function sendBookingEmail(booking, env) {
         </table>
       </div>
       <div style="padding:16px 28px;border-top:1px solid rgba(255,255,255,.07);font-size:11px;color:rgba(255,255,255,.30)">
-        Booking ID: ${booking.id} · Lusso Auto Studio Admin
+        Reference: ${booking.ref} · Booking ID: ${booking.id} · Lusso Auto Studio Admin
       </div>
     </div>`;
 
@@ -119,17 +121,22 @@ async function sendCustomerConfirmation(booking, env) {
       <div style="padding:24px 28px">
         <p style="margin:0 0 20px;color:rgba(255,255,255,.70);line-height:1.7">Hi ${booking.name}, your booking has been received and confirmed. Here are your details:</p>
         <table style="width:100%;border-collapse:collapse">
-          <tr><td style="padding:8px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em;width:110px">Date</td><td style="padding:8px 0;font-size:14px;font-weight:600">${dateLabel}</td></tr>
+          <tr><td style="padding:8px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em;width:110px">Reference</td><td style="padding:8px 0;font-size:14px;font-weight:600;color:#c7a76a;font-family:monospace;letter-spacing:.05em">${booking.ref}</td></tr>
+          <tr><td style="padding:8px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Date</td><td style="padding:8px 0;font-size:14px;font-weight:600">${dateLabel}</td></tr>
           <tr><td style="padding:8px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Time</td><td style="padding:8px 0;font-size:14px;font-weight:600;color:#c7a76a">${timeLabel}</td></tr>
           <tr><td style="padding:8px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Service</td><td style="padding:8px 0;font-size:14px">${booking.service}</td></tr>
           <tr><td style="padding:8px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Vehicle</td><td style="padding:8px 0;font-size:14px">${booking.vehicle}</td></tr>
         </table>
         <div style="margin-top:20px;padding:14px 16px;border-radius:12px;background:rgba(199,167,106,.08);border:1px solid rgba(199,167,106,.18);color:rgba(255,255,255,.65);font-size:13px;line-height:1.6">
-          We will confirm final details by text before your appointment. If you need to make any changes, please reply to this email or contact us directly.
+          We will confirm final details by text before your appointment.
         </div>
+        <p style="margin:20px 0 0;color:rgba(255,255,255,.65);font-size:13px;line-height:1.7">
+          Should your plans change, you can reschedule or cancel at no charge up to 24 hours before your appointment — any time, from the link below. Within 24 hours, your $50 deposit holds the reserved time.
+        </p>
+        ${booking.manage_link ? `<div style="margin:20px 0 4px"><a href="${booking.manage_link}" style="display:inline-block;padding:12px 22px;border-radius:12px;background:#c7a76a;color:#09090b;font-size:14px;font-weight:700;text-decoration:none">Manage your appointment</a></div>` : ""}
       </div>
       <div style="padding:16px 28px;border-top:1px solid rgba(255,255,255,.07);font-size:11px;color:rgba(255,255,255,.30)">
-        Booking ID: ${booking.id} · Lusso Auto Studio · lussoautostudio.ca
+        Reference: ${booking.ref} · Lusso Auto Studio · lussoautostudio.ca
       </div>
     </div>`;
 
@@ -249,25 +256,46 @@ export async function onRequestPost({ request, env }) {
     return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
   }
 
-  // ── Insert ──────────────────────────────────────────────────────────────────
+  // ── Insert (with unique ref; retry suffix on collision) ─────────────────────
   const id         = crypto.randomUUID();
   const created_at = new Date().toISOString();
 
-  try {
-    await env.DB.prepare(
-      `INSERT INTO bookings
-         (id, date, start_hour, duration_hours, end_hour,
-          service, name, phone, email, vehicle, city, notes, status, created_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?)`
-    ).bind(id, date, start_hour, duration_hours, end_hour, service, name, phone, email, vehicle, city, notes, created_at).run();
-  } catch (e) {
-    console.error("[book] insert error:", e?.message ?? e);
+  let ref = null;
+  let inserted = false;
+  for (let attempt = 0; attempt < 5 && !inserted; attempt++) {
+    ref = generateRef("B");
+    try {
+      await env.DB.prepare(
+        `INSERT INTO bookings
+           (id, date, start_hour, duration_hours, end_hour,
+            service, name, phone, email, vehicle, city, notes, status, created_at, ref)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)`
+      ).bind(id, date, start_hour, duration_hours, end_hour, service, name, phone, email, vehicle, city, notes, created_at, ref).run();
+      inserted = true;
+    } catch (e) {
+      const msg = String(e?.message ?? e);
+      if (msg.includes("UNIQUE") && msg.includes("ref")) continue; // ref collision → new suffix
+      console.error("[book] insert error:", msg);
+      return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
+    }
+  }
+  if (!inserted) {
+    console.error("[book] could not generate a unique ref after 5 attempts");
     return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
   }
 
-  // ── Send notification emails (non-blocking) ─────────────────────────────────
-  await sendBookingEmail({ id, date, start_hour, end_hour, service, name, phone, email, vehicle, city, notes }, env);
-  await sendCustomerConfirmation({ id, date, start_hour, end_hour, service, name, email, vehicle }, env);
+  // ── Manage link (magic token) ────────────────────────────────────────────────
+  let mLink = null;
+  try {
+    const token = await getOrCreateManageToken(env, { id, date, start_hour });
+    mLink = manageLink(token);
+  } catch (e) {
+    console.error("[book] manage token error:", e?.message ?? e);
+  }
 
-  return json({ ok: true, id, date, start_hour, end_hour, service }, 201);
+  // ── Send notification emails (non-blocking) ─────────────────────────────────
+  await sendBookingEmail({ id, ref, date, start_hour, end_hour, service, name, phone, email, vehicle, city, notes }, env);
+  await sendCustomerConfirmation({ id, ref, date, start_hour, end_hour, service, name, email, vehicle, manage_link: mLink }, env);
+
+  return json({ ok: true, id, ref, date, start_hour, end_hour, service }, 201);
 }

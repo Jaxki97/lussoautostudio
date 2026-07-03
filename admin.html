@@ -324,6 +324,85 @@
       color: var(--red);
     }
 
+    .resched-btn {
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(199,167,106,.25);
+      background: transparent;
+      color: var(--gold);
+      font-size: 11px;
+      cursor: pointer;
+      transition: background .2s;
+      white-space: nowrap;
+      margin-right: 6px;
+    }
+    .resched-btn:hover { background: rgba(199,167,106,.10); }
+
+    /* ── Admin reschedule modal ───────────────────────────────────────────── */
+    #reschedOverlay {
+      position: fixed; inset: 0; z-index: 90;
+      display: none; align-items: center; justify-content: center;
+      background: rgba(0,0,0,.72);
+      backdrop-filter: blur(4px);
+      padding: 20px;
+    }
+    .resched-modal {
+      width: min(520px, 96vw);
+      max-height: 90vh; overflow-y: auto;
+      border-radius: 20px;
+      background: var(--bg2);
+      box-shadow: 0 0 0 1px var(--line2), 0 32px 80px rgba(0,0,0,.7);
+      padding: 26px;
+    }
+    .resched-modal h3 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 22px; margin-bottom: 4px;
+    }
+    .resched-modal .rm-sub { font-size: 12px; color: var(--muted2); font-family: var(--mono); margin-bottom: 18px; }
+    .rm-field { margin-bottom: 14px; }
+    .rm-field label {
+      display:block; font-size: 11px; letter-spacing: .18em; text-transform: uppercase;
+      color: var(--muted2); margin-bottom: 6px;
+    }
+    .rm-field input[type=date], .rm-field select, .rm-field input[type=text] {
+      width: 100%;
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .rm-field input:focus, .rm-field select:focus { border-color: rgba(199,167,106,.40); }
+    .rm-slots { display: flex; flex-wrap: wrap; gap: 8px; min-height: 20px; }
+    .rm-slot {
+      padding: 8px 13px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: var(--bg3); color: var(--text);
+      font-size: 13px; font-family: var(--mono);
+      cursor: pointer; transition: border-color .15s, background .15s;
+    }
+    .rm-slot.sel { border-color: var(--gold); background: rgba(199,167,106,.12); color: var(--gold); }
+    .rm-slot:disabled { opacity: .35; cursor: default; }
+    .rm-actions { display: flex; gap: 10px; margin-top: 20px; }
+    .rm-confirm {
+      flex: 1; padding: 12px; border-radius: 12px; border: none;
+      background: var(--gold); color: #09090b; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: opacity .15s;
+    }
+    .rm-confirm:hover { opacity: .88; }
+    .rm-confirm:disabled { opacity: .4; cursor: default; }
+    .rm-cancel {
+      padding: 12px 18px; border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10); background: transparent;
+      color: var(--muted); font-size: 14px; cursor: pointer;
+    }
+    .rm-status { font-size: 12px; min-height: 16px; margin-top: 10px; font-family: var(--mono); color: var(--muted2); }
+    .rm-status.err { color: var(--red); }
+    .rm-status.ok  { color: var(--green); }
+
     /* ── Empty / loading states ───────────────────────────────────────────── */
     .state-row td {
       text-align: center;
@@ -647,6 +726,7 @@
         <table>
           <thead>
             <tr>
+              <th>Ref</th>
               <th>Date</th>
               <th>Time</th>
               <th>Client</th>
@@ -654,6 +734,7 @@
               <th>Vehicle</th>
               <th>City</th>
               <th>Service</th>
+              <th>Deposit</th>
               <th>Notes</th>
               <th>Status</th>
               <th></th>
@@ -661,7 +742,7 @@
           </thead>
           <tbody id="bookingsTbody">
             <tr class="state-row">
-              <td colspan="10">
+              <td colspan="12">
                 <span class="state-icon">⏳</span>
                 <span class="state-msg">Loading bookings…</span>
               </td>
@@ -741,6 +822,44 @@
       </div>
     </div>
 
+  </div>
+</div>
+
+<!-- ── Admin reschedule modal ───────────────────────────────────────────── -->
+<div id="reschedOverlay">
+  <div class="resched-modal">
+    <h3>Reschedule Booking</h3>
+    <div class="rm-sub" id="rmSub"></div>
+
+    <div class="rm-field">
+      <label for="rmDate">New date</label>
+      <input type="date" id="rmDate" />
+    </div>
+
+    <div class="rm-field">
+      <label>New time</label>
+      <div class="rm-slots" id="rmSlots"><span style="font-size:12px;color:var(--muted2)">Pick a date to see open times.</span></div>
+    </div>
+
+    <div class="rm-field">
+      <label for="rmDeposit">Deposit</label>
+      <select id="rmDeposit">
+        <option value="carry" selected>Roll forward (deposit moves with the booking)</option>
+        <option value="refund">Refund</option>
+        <option value="forfeit">Forfeit (keep it)</option>
+      </select>
+    </div>
+
+    <div class="rm-field">
+      <label for="rmReason">Reason (required)</label>
+      <input type="text" id="rmReason" placeholder="e.g. called, kid sick, moved to Sat" maxlength="500" />
+    </div>
+
+    <div class="rm-actions">
+      <button class="rm-confirm" id="rmConfirm" disabled>Reschedule</button>
+      <button class="rm-cancel" id="rmClose">Close</button>
+    </div>
+    <div class="rm-status" id="rmStatus"></div>
   </div>
 </div>
 
@@ -828,19 +947,19 @@ let allBookings = [];
 
 async function loadBookings() {
   const tbody = document.getElementById("bookingsTbody");
-  tbody.innerHTML = `<tr class="state-row"><td colspan="10"><span class="state-icon">⏳</span><span class="state-msg">Loading…</span></td></tr>`;
+  tbody.innerHTML = `<tr class="state-row"><td colspan="12"><span class="state-icon">⏳</span><span class="state-msg">Loading…</span></td></tr>`;
 
   let res, data;
   try {
     res  = await fetch("/api/admin/bookings", { headers: { "Accept": "application/json", "x-admin-token": ADMIN_TOKEN } });
     data = await res.json();
   } catch(e) {
-    tbody.innerHTML = `<tr class="state-row"><td colspan="10"><span class="state-icon">⚠️</span><span class="state-msg">Could not reach the API. Is your backend deployed?</span></td></tr>`;
+    tbody.innerHTML = `<tr class="state-row"><td colspan="12"><span class="state-icon">⚠️</span><span class="state-msg">Could not reach the API. Is your backend deployed?</span></td></tr>`;
     return;
   }
 
   if (!res.ok || !data?.ok) {
-    tbody.innerHTML = `<tr class="state-row"><td colspan="10"><span class="state-icon">⚠️</span><span class="state-msg">${data?.error || "API error"}</span></td></tr>`;
+    tbody.innerHTML = `<tr class="state-row"><td colspan="12"><span class="state-icon">⚠️</span><span class="state-msg">${data?.error || "API error"}</span></td></tr>`;
     return;
   }
 
@@ -915,15 +1034,20 @@ function renderTable() {
 
   const tbody = document.getElementById("bookingsTbody");
   if (!filtered.length) {
-    tbody.innerHTML = `<tr class="state-row"><td colspan="10"><span class="state-icon">📭</span><span class="state-msg">No bookings match your filters.</span></td></tr>`;
+    tbody.innerHTML = `<tr class="state-row"><td colspan="12"><span class="state-icon">📭</span><span class="state-msg">No bookings match your filters.</span></td></tr>`;
     return;
   }
 
   tbody.innerHTML = filtered.map(b => {
     const isPast = b.date < today;
     const rowStyle = isPast ? 'style="opacity:.55"' : "";
+    const depositLabels = { none: "—", held: "Held", applied: "Applied", refunded: "Refunded", forfeited: "Forfeited" };
+    const events = safeEvents(b.event_log);
     return `
       <tr ${rowStyle}>
+        <td class="td-date" style="font-size:11px">${esc(b.ref || "—")}<br>
+          ${events.length ? `<a href="#" onclick="toggleLog('${b.id}');return false" style="color:var(--muted2);font-size:10px">history (${events.length})</a>` : ""}
+        </td>
         <td class="td-date">${formatDate(b.date)}<br><span style="color:var(--muted2);font-size:11px">${b.date}</span></td>
         <td class="td-time">${formatHour(b.start_hour)}<br><span style="color:var(--muted2)">→ ${formatHour(b.end_hour)}</span></td>
         <td class="td-name">${esc(b.name)}</td>
@@ -931,16 +1055,141 @@ function renderTable() {
         <td class="td-vehicle">${esc(b.vehicle)}</td>
         <td style="font-size:12px;color:var(--muted)">${esc(b.city || "—")}</td>
         <td><span class="badge badge-service">${esc(b.service)}</span></td>
+        <td style="font-size:12px;color:var(--muted)">${depositLabels[b.deposit_status] ?? "—"}${(b.reschedule_count ?? 0) > 0 ? `<br><span style="color:var(--muted2);font-size:11px">${b.reschedule_count} resched.</span>` : ""}</td>
         <td class="td-notes" title="${esc(b.notes || "")}">${esc(b.notes || "—")}</td>
         <td><span class="badge badge-active"><span class="badge-dot"></span>${esc(b.status)}</span></td>
-        <td>${b.status === "active" ? `<button class="cancel-btn" onclick="cancelBooking('${b.id}')">Cancel</button>` : ""}</td>
-      </tr>`;
+        <td style="white-space:nowrap">${b.status === "active" ? `
+          <button class="resched-btn" onclick="openReschedule('${b.id}')">Reschedule</button>
+          <button class="cancel-btn" onclick="cancelBooking('${b.id}')">Cancel</button>` : ""}</td>
+      </tr>
+      <tr id="log-${b.id}" style="display:none"><td colspan="12" style="padding:6px 16px 14px;background:var(--bg3)">
+        ${events.map(ev => `<div style="font-family:var(--mono);font-size:11px;color:var(--muted);padding:3px 0">
+          <span style="color:var(--gold)">${esc(ev.event)}</span>
+          ${ev.from ? ` ${esc(ev.from.date)} ${formatHour(ev.from.start_hour)} → ${esc(ev.to.date)} ${formatHour(ev.to.start_hour)}` : ""}
+          · by ${esc(ev.by)} · notice ${ev.notice_hours}h · deposit: ${esc(ev.deposit ?? "—")}
+          ${ev.reason ? ` · reason: ${esc(ev.reason)}` : ""}
+          · <span style="color:var(--muted2)">${esc((ev.at || "").replace("T", " ").slice(0, 16))} UTC</span>
+        </div>`).join("") || ""}
+      </td></tr>`;
   }).join("");
 }
 
 function esc(str) {
   return String(str ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
 }
+
+function safeEvents(raw) {
+  try { const a = JSON.parse(raw || "[]"); return Array.isArray(a) ? a : []; }
+  catch { return []; }
+}
+
+function toggleLog(id) {
+  const row = document.getElementById("log-" + id);
+  if (row) row.style.display = row.style.display === "none" ? "table-row" : "none";
+}
+
+// ── Admin reschedule modal ────────────────────────────────────────────────
+let rmBooking = null;
+let rmSelectedHour = null;
+
+function openReschedule(id) {
+  rmBooking = allBookings.find(b => b.id === id);
+  if (!rmBooking) return;
+  rmSelectedHour = null;
+  document.getElementById("rmSub").textContent =
+    `${rmBooking.ref || rmBooking.id} · ${rmBooking.name} · ${rmBooking.service} · currently ${rmBooking.date} at ${formatHour(rmBooking.start_hour)} · ${rmBooking.reschedule_count || 0} customer reschedules used · deposit: ${rmBooking.deposit_status || "—"}`;
+  const dateInput = document.getElementById("rmDate");
+  dateInput.value = "";
+  const max = new Date(); max.setDate(max.getDate() + 30);
+  dateInput.min = todayStr();
+  dateInput.max = `${max.getFullYear()}-${String(max.getMonth()+1).padStart(2,"0")}-${String(max.getDate()).padStart(2,"0")}`;
+  document.getElementById("rmSlots").innerHTML = '<span style="font-size:12px;color:var(--muted2)">Pick a date to see open times.</span>';
+  document.getElementById("rmDeposit").value = "carry";
+  document.getElementById("rmReason").value = "";
+  document.getElementById("rmStatus").textContent = "";
+  document.getElementById("rmStatus").className = "rm-status";
+  updateRmConfirm();
+  document.getElementById("reschedOverlay").style.display = "flex";
+}
+
+function updateRmConfirm() {
+  const ok = rmBooking && rmSelectedHour !== null &&
+             document.getElementById("rmDate").value &&
+             document.getElementById("rmReason").value.trim();
+  document.getElementById("rmConfirm").disabled = !ok;
+}
+
+document.getElementById("rmClose").addEventListener("click", () => {
+  document.getElementById("reschedOverlay").style.display = "none";
+});
+document.getElementById("rmReason").addEventListener("input", updateRmConfirm);
+
+document.getElementById("rmDate").addEventListener("change", async () => {
+  const date = document.getElementById("rmDate").value;
+  rmSelectedHour = null;
+  updateRmConfirm();
+  const box = document.getElementById("rmSlots");
+  if (!date || !rmBooking) return;
+  box.innerHTML = '<span style="font-size:12px;color:var(--muted2)">Loading…</span>';
+  try {
+    const res = await fetch(`/api/slots?date=${date}&duration_hours=${rmBooking.duration_hours}`);
+    const data = await res.json();
+    const slots = (data.slots || []);
+    if (!slots.length) {
+      box.innerHTML = `<span style="font-size:12px;color:var(--muted2)">No times on this date${data.reason ? ` (${data.reason})` : ""}.</span>`;
+      return;
+    }
+    box.innerHTML = slots.map(s =>
+      `<button class="rm-slot" data-hour="${s.start_hour}" ${s.status !== "available" ? "disabled" : ""}>${s.label}</button>`
+    ).join("");
+    box.querySelectorAll(".rm-slot:not([disabled])").forEach(btn => {
+      btn.addEventListener("click", () => {
+        box.querySelectorAll(".rm-slot").forEach(b => b.classList.remove("sel"));
+        btn.classList.add("sel");
+        rmSelectedHour = Number(btn.dataset.hour);
+        updateRmConfirm();
+      });
+    });
+  } catch(e) {
+    box.innerHTML = '<span style="font-size:12px;color:var(--red)">Could not load times.</span>';
+  }
+});
+
+document.getElementById("rmConfirm").addEventListener("click", async () => {
+  const btn = document.getElementById("rmConfirm");
+  const statusEl = document.getElementById("rmStatus");
+  btn.disabled = true;
+  statusEl.textContent = "Rescheduling…";
+  statusEl.className = "rm-status";
+  try {
+    const res = await fetch("/api/admin/reschedule", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-token": ADMIN_TOKEN },
+      body: JSON.stringify({
+        booking_id:     rmBooking.id,
+        date:           document.getElementById("rmDate").value,
+        start_hour:     rmSelectedHour,
+        deposit_action: document.getElementById("rmDeposit").value,
+        reason:         document.getElementById("rmReason").value.trim(),
+      }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      statusEl.textContent = "Rescheduled. Customer has been emailed.";
+      statusEl.className = "rm-status ok";
+      await loadBookings();
+      setTimeout(() => { document.getElementById("reschedOverlay").style.display = "none"; }, 1200);
+    } else {
+      statusEl.textContent = data.error || "Reschedule failed.";
+      statusEl.className = "rm-status err";
+      btn.disabled = false;
+    }
+  } catch(e) {
+    statusEl.textContent = "Network error. Try again.";
+    statusEl.className = "rm-status err";
+    btn.disabled = false;
+  }
+});
 
 // ── Cancel booking ─────────────────────────────────────────────────────────
 async function cancelBooking(id) {

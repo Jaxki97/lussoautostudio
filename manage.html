@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Manage Your Appointment — Lusso Auto Studio</title>
+  <meta name="robots" content="noindex,nofollow" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg:     #09090b;
+      --bg2:    #0f0f12;
+      --bg3:    #141418;
+      --line:   rgba(255,255,255,.07);
+      --line2:  rgba(199,167,106,.20);
+      --text:   rgba(255,255,255,.92);
+      --muted:  rgba(255,255,255,.55);
+      --muted2: rgba(255,255,255,.30);
+      --gold:   #c7a76a;
+      --gold2:  #a8894e;
+      --green:  #4ade80;
+      --red:    #f87171;
+      --radius: 18px;
+      --mono:   "DM Mono", monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      padding: 0 24px;
+    }
+    .hrow {
+      max-width: 640px; margin: 0 auto;
+      display: flex; align-items: center; gap: 12px; height: 62px;
+    }
+    .hlogo {
+      width: 34px; height: 34px; border-radius: 999px;
+      display: grid; place-items: center;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.04));
+      box-shadow: 0 0 0 1px var(--line2) inset;
+    }
+    .hlogo span { font-family: "Cormorant Garamond", serif; font-size: 18px; color: var(--gold); }
+    .brand-name { font-family: "Cormorant Garamond", serif; font-size: 17px; }
+    .brand-tag { font-size: 10px; letter-spacing: .22em; text-transform: uppercase; color: var(--muted2); margin-top: 1px; }
+
+    main { flex: 1; width: 100%; max-width: 640px; margin: 0 auto; padding: 36px 24px 80px; }
+
+    h1 {
+      font-family: "Cormorant Garamond", serif;
+      font-size: 32px; font-weight: 600; letter-spacing: .01em;
+      margin-bottom: 6px;
+    }
+    .ref-line { font-family: var(--mono); font-size: 13px; color: var(--gold); margin-bottom: 26px; letter-spacing: .05em; }
+    .intro { color: var(--muted); font-size: 14px; line-height: 1.7; margin-bottom: 24px; }
+
+    .card {
+      border-radius: var(--radius);
+      background: var(--bg2);
+      box-shadow: 0 0 0 1px var(--line);
+      padding: 24px;
+      margin-bottom: 18px;
+    }
+
+    .summary-row {
+      display: flex; justify-content: space-between; gap: 16px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+    }
+    .summary-row:last-child { border-bottom: none; }
+    .summary-label {
+      font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--muted2); padding-top: 2px; flex-shrink: 0;
+    }
+    .summary-val { text-align: right; font-weight: 500; }
+    .summary-val.gold { color: var(--gold); font-family: var(--mono); font-size: 13px; letter-spacing: .04em; }
+
+    .status-line {
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 13px; line-height: 1.7;
+      margin-bottom: 20px;
+    }
+    .status-free {
+      background: rgba(74,222,128,.06);
+      border: 1px solid rgba(74,222,128,.16);
+      color: rgba(255,255,255,.75);
+    }
+    .status-late {
+      background: rgba(199,167,106,.07);
+      border: 1px solid rgba(199,167,106,.22);
+      color: rgba(255,255,255,.75);
+    }
+    .status-line b { color: var(--text); }
+
+    .btn {
+      display: inline-block;
+      padding: 13px 24px;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px; font-weight: 700;
+      cursor: pointer;
+      transition: opacity .15s, background .15s;
+      text-align: center;
+    }
+    .btn-gold { background: var(--gold); color: #09090b; }
+    .btn-gold:hover { opacity: .88; }
+    .btn-gold:disabled { opacity: .4; cursor: default; }
+    .btn-ghost {
+      background: transparent; color: var(--muted);
+      border: 1px solid rgba(255,255,255,.12);
+    }
+    .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,.25); }
+    .btn-danger {
+      background: transparent; color: rgba(248,113,113,.85);
+      border: 1px solid rgba(248,113,113,.25);
+    }
+    .btn-danger:hover { background: rgba(248,113,113,.08); }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 8px; }
+    .btn-row .btn { flex: 1; min-width: 140px; }
+
+    .cap-note { font-size: 13px; color: var(--muted); line-height: 1.7; margin-top: 10px; }
+
+    input[type=email], input[type=text], input[type=date] {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    input:focus {
+      border-color: rgba(199,167,106,.45);
+      box-shadow: 0 0 0 3px rgba(199,167,106,.12);
+    }
+    label.field-label {
+      display: block;
+      font-size: 11px; letter-spacing: .2em; text-transform: uppercase;
+      color: var(--muted2); margin-bottom: 8px;
+    }
+    .field { margin-bottom: 16px; }
+
+    .msg { font-size: 13px; line-height: 1.6; min-height: 20px; margin-top: 12px; }
+    .msg.err { color: var(--red); }
+    .msg.ok  { color: var(--muted); }
+
+    .slots { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; min-height: 24px; }
+    .slot {
+      padding: 10px 15px; border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: var(--bg3); color: var(--text);
+      font-size: 14px; font-family: var(--mono);
+      cursor: pointer; transition: border-color .15s, background .15s;
+    }
+    .slot.sel { border-color: var(--gold); background: rgba(199,167,106,.12); color: var(--gold); }
+    .slot:disabled { opacity: .35; cursor: default; }
+
+    .confirm-text { font-size: 14px; line-height: 1.8; color: rgba(255,255,255,.78); margin-bottom: 18px; }
+    .confirm-text b { color: var(--gold); }
+
+    .success-mark {
+      width: 52px; height: 52px; border-radius: 999px;
+      display: grid; place-items: center;
+      background: rgba(74,222,128,.10);
+      border: 1px solid rgba(74,222,128,.25);
+      color: var(--green); font-size: 24px;
+      margin-bottom: 18px;
+    }
+
+    .chooser-item {
+      display: block; width: 100%;
+      text-align: left;
+      padding: 16px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: var(--bg3);
+      color: var(--text);
+      font-size: 14px;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: border-color .15s;
+    }
+    .chooser-item:hover { border-color: rgba(199,167,106,.4); }
+    .chooser-item .ci-ref { font-family: var(--mono); font-size: 12px; color: var(--gold); }
+
+    footer {
+      border-top: 1px solid var(--line);
+      padding: 20px 24px;
+      text-align: center;
+      font-size: 12px; color: var(--muted2);
+    }
+    footer a { color: var(--gold2); text-decoration: none; }
+    .view { display: none; }
+    .view.on { display: block; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="hrow">
+    <div class="hlogo"><span>L</span></div>
+    <div>
+      <div class="brand-name">Lusso Auto Studio</div>
+      <div class="brand-tag">Appointments</div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+  <!-- ── Loading ─────────────────────────────────────────────────────────── -->
+  <div class="view on" id="viewLoading">
+    <h1>Manage your appointment</h1>
+    <p class="intro">One moment…</p>
+  </div>
+
+  <!-- ── Entry / lost-link (§4) ──────────────────────────────────────────── -->
+  <div class="view" id="viewEntry">
+    <h1>Manage your appointment</h1>
+    <p class="intro" id="entryIntro">Enter the email on your booking and we'll send you a secure code.</p>
+    <div class="card">
+      <div id="entryStepEmail">
+        <div class="field">
+          <label class="field-label" for="entryEmail">Email</label>
+          <input type="email" id="entryEmail" autocomplete="email" />
+        </div>
+        <button class="btn btn-gold" id="sendCodeBtn" style="width:100%">Send code</button>
+        <div class="msg" id="entryMsg"></div>
+      </div>
+      <div id="entryStepCode" style="display:none">
+        <div class="field">
+          <label class="field-label" for="entryCode">Enter your 6-digit code</label>
+          <input type="text" id="entryCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" style="font-family:var(--mono);letter-spacing:.35em;text-align:center;font-size:20px" />
+        </div>
+        <button class="btn btn-gold" id="verifyCodeBtn" style="width:100%">Continue</button>
+        <div class="msg" id="codeMsg"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Chooser (§4.4) ──────────────────────────────────────────────────── -->
+  <div class="view" id="viewChooser">
+    <h1>Which appointment?</h1>
+    <p class="intro">You have more than one upcoming appointment on this email.</p>
+    <div id="chooserList"></div>
+  </div>
+
+  <!-- ── Booking summary (§3.1–3.3) ──────────────────────────────────────── -->
+  <div class="view" id="viewBooking">
+    <h1>Manage your appointment</h1>
+    <div class="ref-line" id="refLine"></div>
+
+    <div class="card" id="summaryCard"></div>
+
+    <div class="status-line" id="statusLine"></div>
+
+    <div class="btn-row" id="actionRow">
+      <button class="btn btn-gold" id="rescheduleBtn">Reschedule</button>
+      <button class="btn btn-danger" id="cancelBtn">Cancel appointment</button>
+    </div>
+    <p class="cap-note" id="capNote" style="display:none"></p>
+  </div>
+
+  <!-- ── Reschedule slot picker (§3.4) ───────────────────────────────────── -->
+  <div class="view" id="viewPicker">
+    <h1>Choose a new time</h1>
+    <p class="intro">Availability shown for the next 30 days.</p>
+    <div class="card">
+      <div class="field">
+        <label class="field-label" for="pickDate">New date</label>
+        <input type="date" id="pickDate" />
+      </div>
+      <div class="slots" id="pickSlots"></div>
+      <div class="msg" id="pickMsg"></div>
+      <div class="btn-row">
+        <button class="btn btn-gold" id="pickContinue" disabled>Continue</button>
+        <button class="btn btn-ghost" id="pickBack">Back</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Reschedule confirm (§3.5) ───────────────────────────────────────── -->
+  <div class="view" id="viewConfirmResched">
+    <h1>Confirm your change</h1>
+    <div class="card">
+      <p class="confirm-text" id="reschedConfirmText"></p>
+      <div class="btn-row">
+        <button class="btn btn-gold" id="reschedConfirmBtn"></button>
+        <button class="btn btn-ghost" id="reschedBackBtn">Back</button>
+      </div>
+      <div class="msg" id="reschedMsg"></div>
+    </div>
+  </div>
+
+  <!-- ── Cancel confirm (§3.6) ───────────────────────────────────────────── -->
+  <div class="view" id="viewConfirmCancel">
+    <h1>Cancel this appointment?</h1>
+    <div class="card">
+      <p class="confirm-text" id="cancelConfirmText"></p>
+      <div class="btn-row">
+        <button class="btn btn-danger" id="cancelConfirmBtn">Confirm cancellation</button>
+        <button class="btn btn-ghost" id="cancelBackBtn">Keep appointment</button>
+      </div>
+      <div class="msg" id="cancelMsg"></div>
+    </div>
+  </div>
+
+  <!-- ── Success (§3.7) ──────────────────────────────────────────────────── -->
+  <div class="view" id="viewSuccess">
+    <div class="success-mark">✓</div>
+    <h1 id="successTitle"></h1>
+    <p class="intro" id="successText"></p>
+    <div class="btn-row" style="max-width:280px">
+      <button class="btn btn-ghost" id="successBackBtn" style="display:none">Back to your appointment</button>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Lusso Auto Studio · <a href="https://lussoautostudio.ca">lussoautostudio.ca</a>
+</footer>
+
+<script>
+// ── State ─────────────────────────────────────────────────────────────────
+let token   = new URLSearchParams(location.search).get("token") || "";
+let booking = null;             // summary from GET /api/manage/booking
+let picked  = null;             // { date, start_hour, label }
+
+const $ = id => document.getElementById(id);
+
+function show(viewId) {
+  document.querySelectorAll(".view").forEach(v => v.classList.remove("on"));
+  $(viewId).classList.add("on");
+  window.scrollTo(0, 0);
+}
+
+function esc(str) {
+  return String(str ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+
+function formatHour(h) {
+  const period = h >= 12 ? "PM" : "AM";
+  const hr = ((h + 11) % 12) + 1;
+  return `${hr}:00 ${period}`;
+}
+function formatDate(dateStr) {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const days   = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+  const dow    = new Date(y, m - 1, d).getDay();
+  return `${days[dow]}, ${months[m-1]} ${d}, ${y}`;
+}
+
+const DEPOSIT_LABELS = {
+  held:      "Held",
+  applied:   "Applied to service",
+  refunded:  "Refunded",
+  forfeited: "Applied to reserved time",
+};
+
+const GENERIC_ERR = "Something went wrong on our end. Please try again in a moment.";
+
+// ── Load booking from token ───────────────────────────────────────────────
+async function loadBooking() {
+  if (!token) { show("viewEntry"); return; }
+  show("viewLoading");
+  try {
+    const res  = await fetch(`/api/manage/booking?token=${encodeURIComponent(token)}`);
+    const data = await res.json();
+    if (!data.ok) {
+      if (data.error === "expired_link") {
+        token = "";
+        history.replaceState(null, "", "/manage");
+        $("entryIntro").textContent = "This link has expired. Enter your email to receive a new one.";
+        show("viewEntry");
+      } else {
+        $("entryIntro").textContent = GENERIC_ERR;
+        show("viewEntry");
+      }
+      return;
+    }
+    booking = data.booking;
+    renderBooking();
+  } catch (e) {
+    $("entryIntro").textContent = GENERIC_ERR;
+    show("viewEntry");
+  }
+}
+
+function renderBooking() {
+  const b = booking;
+  $("refLine").textContent = `Reference ${b.ref}`;
+
+  const rows = [
+    ["Reference", `<span class="summary-val gold">${esc(b.ref)}</span>`],
+    ["Service",   `<span class="summary-val">${esc(b.service)}</span>`],
+    ["Date",      `<span class="summary-val">${formatDate(b.date)}</span>`],
+    ["Time",      `<span class="summary-val">${formatHour(b.start_hour)} – ${formatHour(b.end_hour)}</span>`],
+  ];
+  if (b.city) rows.push(["Location", `<span class="summary-val">${esc(b.city)}</span>`]);
+  if (b.deposit_status && b.deposit_status !== "none") {
+    rows.push(["Deposit", `<span class="summary-val">${DEPOSIT_LABELS[b.deposit_status] ?? "—"}</span>`]);
+  }
+  $("summaryCard").innerHTML = rows.map(([label, val]) =>
+    `<div class="summary-row"><span class="summary-label">${label}</span>${val}</div>`
+  ).join("");
+
+  const statusEl = $("statusLine");
+  const actions  = $("actionRow");
+  const capNote  = $("capNote");
+
+  if (b.status !== "active") {
+    statusEl.className = "status-line status-late";
+    statusEl.innerHTML = "This appointment has been cancelled.";
+    actions.style.display = "none";
+    capNote.style.display = "none";
+    show("viewBooking");
+    return;
+  }
+  if (b.past) {
+    statusEl.className = "status-line status-late";
+    statusEl.innerHTML = "This appointment has passed.";
+    actions.style.display = "none";
+    capNote.style.display = "none";
+    show("viewBooking");
+    return;
+  }
+
+  actions.style.display = "flex";
+  if (b.within_cutoff) {
+    statusEl.className = "status-line status-late";
+    statusEl.innerHTML = "This appointment is within 24 hours. Cancelling now applies your deposit to the reserved time; rescheduling will require a new deposit.";
+  } else {
+    statusEl.className = "status-line status-free";
+    statusEl.innerHTML = `You're free to reschedule or cancel until <b>${esc(b.cutoff_label)}</b>.`;
+  }
+
+  if (b.reschedule_remaining <= 0) {
+    $("rescheduleBtn").disabled = true;
+    capNote.style.display = "block";
+    capNote.textContent = "You've reached the reschedule limit for this booking. To make a further change, reach us directly at bookings@lussoautostudio.ca.";
+  } else {
+    $("rescheduleBtn").disabled = false;
+    capNote.style.display = "none";
+  }
+  show("viewBooking");
+}
+
+// ── Entry / OTP flow ──────────────────────────────────────────────────────
+$("sendCodeBtn").addEventListener("click", async () => {
+  const email = $("entryEmail").value.trim();
+  const msg = $("entryMsg");
+  if (!email) { msg.className = "msg err"; msg.textContent = "Please enter your email."; return; }
+  $("sendCodeBtn").disabled = true;
+  msg.className = "msg ok"; msg.textContent = "Sending…";
+  try {
+    const res  = await fetch("/api/manage/request-otp", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const data = await res.json();
+    msg.className = "msg ok";
+    msg.textContent = data.message || "If a booking exists for that email, we've sent a code. It expires in 10 minutes.";
+    $("entryStepCode").style.display = "block";
+    $("entryCode").focus();
+  } catch (e) {
+    msg.className = "msg err"; msg.textContent = GENERIC_ERR;
+  } finally {
+    $("sendCodeBtn").disabled = false;
+  }
+});
+
+$("verifyCodeBtn").addEventListener("click", verifyCode);
+$("entryCode").addEventListener("keydown", e => { if (e.key === "Enter") verifyCode(); });
+
+async function verifyCode() {
+  const email = $("entryEmail").value.trim();
+  const code  = $("entryCode").value.trim();
+  const msg   = $("codeMsg");
+  if (!/^\d{6}$/.test(code)) { msg.className = "msg err"; msg.textContent = "That code isn't right. Please try again."; return; }
+  $("verifyCodeBtn").disabled = true;
+  try {
+    const res  = await fetch("/api/manage/verify-otp", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, code }),
+    });
+    const data = await res.json();
+    if (!data.ok) {
+      msg.className = "msg err";
+      msg.textContent = data.error || "That code isn't right. Please try again.";
+      return;
+    }
+    if (data.token) {
+      token = data.token;
+      history.replaceState(null, "", `/manage?token=${encodeURIComponent(token)}`);
+      await loadBooking();
+    } else if (data.bookings && data.bookings.length) {
+      $("chooserList").innerHTML = data.bookings.map(b => `
+        <button class="chooser-item" data-token="${esc(b.token)}">
+          <span class="ci-ref">${esc(b.ref)}</span> · ${esc(b.service)}<br>
+          <span style="color:var(--muted);font-size:13px">${formatDate(b.date)} at ${formatHour(b.start_hour)}</span>
+        </button>`).join("");
+      $("chooserList").querySelectorAll(".chooser-item").forEach(btn => {
+        btn.addEventListener("click", async () => {
+          token = btn.dataset.token;
+          history.replaceState(null, "", `/manage?token=${encodeURIComponent(token)}`);
+          await loadBooking();
+        });
+      });
+      show("viewChooser");
+    } else {
+      msg.className = "msg ok";
+      msg.textContent = "No upcoming appointments were found for that email.";
+    }
+  } catch (e) {
+    msg.className = "msg err"; msg.textContent = GENERIC_ERR;
+  } finally {
+    $("verifyCodeBtn").disabled = false;
+  }
+}
+
+// ── Reschedule flow ───────────────────────────────────────────────────────
+$("rescheduleBtn").addEventListener("click", () => {
+  picked = null;
+  $("pickDate").value = "";
+  $("pickSlots").innerHTML = "";
+  $("pickMsg").textContent = "";
+  $("pickContinue").disabled = true;
+  const today = new Date();
+  const max = new Date(); max.setDate(max.getDate() + 30);
+  const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`;
+  $("pickDate").min = fmt(today);
+  $("pickDate").max = fmt(max);
+  show("viewPicker");
+});
+$("pickBack").addEventListener("click", () => show("viewBooking"));
+
+$("pickDate").addEventListener("change", async () => {
+  const date = $("pickDate").value;
+  picked = null;
+  $("pickContinue").disabled = true;
+  const box = $("pickSlots");
+  const msg = $("pickMsg");
+  msg.textContent = "";
+  if (!date) { box.innerHTML = ""; return; }
+  box.innerHTML = `<span style="font-size:13px;color:var(--muted2)">Loading…</span>`;
+  try {
+    const res  = await fetch(`/api/slots?date=${date}&duration_hours=${booking.duration_hours}`);
+    const data = await res.json();
+    const slots = data.slots || [];
+    const open = slots.filter(s => s.status === "available");
+    if (!slots.length || !open.length) {
+      box.innerHTML = "";
+      const reasons = { weekday: "Appointments are available on weekends only.", blocked: "That date is unavailable.", past: "That date has passed.", too_far: "Availability is shown for the next 30 days." };
+      msg.className = "msg ok";
+      msg.textContent = reasons[data.reason] || "No open times on this date. Please choose another.";
+      return;
+    }
+    box.innerHTML = slots.map(s =>
+      `<button class="slot" data-hour="${s.start_hour}" data-label="${esc(s.label)}" ${s.status !== "available" ? "disabled" : ""}>${esc(s.label)}</button>`
+    ).join("");
+    box.querySelectorAll(".slot:not([disabled])").forEach(btn => {
+      btn.addEventListener("click", () => {
+        box.querySelectorAll(".slot").forEach(x => x.classList.remove("sel"));
+        btn.classList.add("sel");
+        picked = { date, start_hour: Number(btn.dataset.hour), label: btn.dataset.label };
+        $("pickContinue").disabled = false;
+      });
+    });
+  } catch (e) {
+    box.innerHTML = "";
+    msg.className = "msg err"; msg.textContent = GENERIC_ERR;
+  }
+});
+
+$("pickContinue").addEventListener("click", () => {
+  if (!picked) return;
+  const txt = $("reschedConfirmText");
+  const btn = $("reschedConfirmBtn");
+  if (booking.within_cutoff) {
+    txt.innerHTML = `You're rescheduling within 24 hours of your appointment. Your current $50 deposit won't carry over, and a new $50 deposit will secure <b>${formatDate(picked.date)} at ${esc(picked.label)}</b>.`;
+    btn.textContent = "Continue to deposit";
+  } else {
+    txt.innerHTML = `Move your appointment to <b>${formatDate(picked.date)} at ${esc(picked.label)}</b>? Your deposit carries over.`;
+    btn.textContent = "Confirm";
+  }
+  $("reschedMsg").textContent = "";
+  show("viewConfirmResched");
+});
+$("reschedBackBtn").addEventListener("click", () => show("viewPicker"));
+
+$("reschedConfirmBtn").addEventListener("click", async () => {
+  const btn = $("reschedConfirmBtn");
+  const msg = $("reschedMsg");
+  btn.disabled = true;
+  msg.className = "msg ok"; msg.textContent = "One moment…";
+  try {
+    const res  = await fetch("/api/manage/reschedule", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token, date: picked.date, start_hour: picked.start_hour }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      booking = data.booking;
+      $("successTitle").textContent = "Done.";
+      $("successText").textContent = `Your appointment is set for ${formatDate(booking.date)} at ${formatHour(booking.start_hour)}. We've emailed you the details.`;
+      $("successBackBtn").style.display = "block";
+      show("viewSuccess");
+    } else if (data.error === "slot_taken") {
+      msg.className = "msg err";
+      msg.textContent = "That time was just taken. Please choose another.";
+      btn.disabled = false;
+    } else if (data.error === "expired_link") {
+      token = "";
+      history.replaceState(null, "", "/manage");
+      $("entryIntro").textContent = "This link has expired. Enter your email to receive a new one.";
+      show("viewEntry");
+    } else if (data.error === "reschedule limit reached") {
+      msg.className = "msg err";
+      msg.textContent = "You've reached the reschedule limit for this booking. To make a further change, reach us directly at bookings@lussoautostudio.ca.";
+      btn.disabled = false;
+    } else {
+      msg.className = "msg err";
+      msg.textContent = data.error || GENERIC_ERR;
+      btn.disabled = false;
+    }
+  } catch (e) {
+    msg.className = "msg err"; msg.textContent = GENERIC_ERR;
+    btn.disabled = false;
+  }
+});
+
+// ── Cancel flow ───────────────────────────────────────────────────────────
+$("cancelBtn").addEventListener("click", () => {
+  const txt = $("cancelConfirmText");
+  if (booking.within_cutoff) {
+    txt.innerHTML = "Cancel this appointment? As this is within 24 hours, your $50 deposit will be applied to the reserved time.";
+  } else {
+    txt.innerHTML = "Cancel this appointment? Your $50 deposit will be refunded in full.";
+  }
+  $("cancelMsg").textContent = "";
+  $("cancelConfirmBtn").disabled = false;
+  show("viewConfirmCancel");
+});
+$("cancelBackBtn").addEventListener("click", () => show("viewBooking"));
+
+$("cancelConfirmBtn").addEventListener("click", async () => {
+  const btn = $("cancelConfirmBtn");
+  const msg = $("cancelMsg");
+  btn.disabled = true;
+  msg.className = "msg ok"; msg.textContent = "One moment…";
+  try {
+    const res  = await fetch("/api/manage/cancel", {
+      method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ token }),
+    });
+    const data = await res.json();
+    if (data.ok) {
+      $("successTitle").textContent = "Cancelled.";
+      $("successText").textContent = data.outcome === "refunded"
+        ? "Your appointment has been cancelled and your deposit refunded."
+        : "Your appointment has been cancelled.";
+      $("successBackBtn").style.display = "none";
+      show("viewSuccess");
+    } else if (data.error === "expired_link") {
+      token = "";
+      history.replaceState(null, "", "/manage");
+      $("entryIntro").textContent = "This link has expired. Enter your email to receive a new one.";
+      show("viewEntry");
+    } else {
+      msg.className = "msg err"; msg.textContent = data.error || GENERIC_ERR;
+      btn.disabled = false;
+    }
+  } catch (e) {
+    msg.className = "msg err"; msg.textContent = GENERIC_ERR;
+    btn.disabled = false;
+  }
+});
+
+$("successBackBtn").addEventListener("click", loadBooking);
+
+// ── Go ────────────────────────────────────────────────────────────────────
+loadBooking();
+</script>
+</body>
+</html>

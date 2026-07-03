@@ -2,37 +2,45 @@
 User-agent: *
 Disallow: /admin
 Disallow: /api/
+Disallow: /manage
 
 # AI assistants & their search crawlers — explicitly welcome
 # OpenAI (ChatGPT)
 User-agent: GPTBot
 Disallow: /admin
 Disallow: /api/
+Disallow: /manage
 
 User-agent: OAI-SearchBot
 Disallow: /admin
 Disallow: /api/
+Disallow: /manage
 
 User-agent: ChatGPT-User
 Disallow: /admin
 Disallow: /api/
+Disallow: /manage
 
 # Anthropic (Claude)
 User-agent: ClaudeBot
 Disallow: /admin
 Disallow: /api/
+Disallow: /manage
 
 User-agent: Claude-SearchBot
 Disallow: /admin
 Disallow: /api/
+Disallow: /manage
 
 User-agent: Claude-User
 Disallow: /admin
 Disallow: /api/
+Disallow: /manage
 
 # Perplexity
 User-agent: PerplexityBot
 Disallow: /admin
 Disallow: /api/
+Disallow: /manage
 
 Sitemap: https://lussoautostudio.ca/sitemap.xml
