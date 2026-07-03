@@ -9,7 +9,10 @@
 //                      onboarding address: onboarding@resend.dev for testing)
 // =============================================================================
 
-import { generateRef, getOrCreateManageToken, manageLink } from "./_shared.js";
+import {
+  generateRef, getOrCreateManageToken, manageLink,
+  squareConfigured, collectDeposit, refundDeposit,
+} from "./_shared.js";
 
 const CORS_HEADERS = {
   "access-control-allow-origin": "https://lussoautostudio.ca",
@@ -256,32 +259,65 @@ export async function onRequestPost({ request, env }) {
     return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
   }
 
-  // ── Insert (with unique ref; retry suffix on collision) ─────────────────────
   const id         = crypto.randomUUID();
   const created_at = new Date().toISOString();
 
+  // ── $50 deposit — charged before the booking is written ─────────────────────
+  // The browser sends a one-time Square card token; card numbers never reach us.
+  let deposit_status    = "none";
+  let square_payment_id = null;
+  if (squareConfigured(env)) {
+    const payment_token = sanitize(body.payment_token);
+    if (!payment_token) {
+      return json({ ok: false, error: "A card is required to hold your appointment." }, 400);
+    }
+    const pay = await collectDeposit({ id, deposit_amount_cents: 5000 }, env, payment_token);
+    if (!pay.ok) {
+      return json({ ok: false, error: "Your card couldn't be charged. Please check the details and try again." }, 402);
+    }
+    square_payment_id = pay.square_payment_id;
+    deposit_status = "held";
+  }
+
+  // If anything below fails after a successful charge, put the money back.
+  const bail = async (status, message) => {
+    if (square_payment_id) await refundDeposit({ id, square_payment_id, deposit_amount_cents: 5000 }, env);
+    return json({ ok: false, error: message }, status);
+  };
+
+  // ── Insert (with unique ref; retry suffix on collision) ─────────────────────
   let ref = null;
   let inserted = false;
   for (let attempt = 0; attempt < 5 && !inserted; attempt++) {
     ref = generateRef("B");
     try {
-      await env.DB.prepare(
+      // Guarded insert: refuses if the slot filled while the card was charging.
+      const res = await env.DB.prepare(
         `INSERT INTO bookings
            (id, date, start_hour, duration_hours, end_hour,
-            service, name, phone, email, vehicle, city, notes, status, created_at, ref)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'active', ?, ?)`
-      ).bind(id, date, start_hour, duration_hours, end_hour, service, name, phone, email, vehicle, city, notes, created_at, ref).run();
+            service, name, phone, email, vehicle, city, notes, status, created_at, ref,
+            deposit_status, square_payment_id)
+         SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, 'active', ?13, ?14, ?15, ?16
+          WHERE NOT EXISTS (
+            SELECT 1 FROM bookings
+             WHERE date = ?2 AND status = 'active'
+               AND NOT (end_hour <= ?3 OR start_hour >= ?5)
+          )`
+      ).bind(id, date, start_hour, duration_hours, end_hour, service, name, phone, email, vehicle, city, notes, created_at, ref, deposit_status, square_payment_id).run();
+      if ((res.meta?.changes ?? 0) === 0) {
+        return bail(409, "That time slot is no longer available. Please choose another time.");
+      }
       inserted = true;
     } catch (e) {
       const msg = String(e?.message ?? e);
       if (msg.includes("UNIQUE") && msg.includes("ref")) continue; // ref collision → new suffix
       console.error("[book] insert error:", msg);
-      return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
+      return bail(500, "A server error occurred. Please try again.");
     }
   }
   if (!inserted) {
     console.error("[book] could not generate a unique ref after 5 attempts");
-    return json({ ok: false, error: "A server error occurred. Please try again." }, 500);
+    return bail(500, "A server error occurred. Please try again.");
   }
 
   // ── Manage link (magic token) ────────────────────────────────────────────────

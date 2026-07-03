@@ -6,8 +6,8 @@
 
 import {
   CORS_HEADERS, json, resolveToken, noticeHours, validateTargetSlot,
-  atomicSwap, RESCHEDULE_CAP, collectDeposit, forfeitDeposit,
-  getOrCreateManageToken, manageLink, sendEmail, ownerLine,
+  atomicSwap, RESCHEDULE_CAP, collectDeposit, forfeitDeposit, refundDeposit,
+  squareConfigured, getOrCreateManageToken, manageLink, sendEmail, ownerLine,
   emailRescheduleOnTime, emailRescheduleLate, formatHour, esc,
 } from "../_shared.js";
 import { bookingSummary } from "./booking.js";
@@ -58,18 +58,27 @@ export async function onRequestPost({ request, env }) {
 
     if (late) {
       // Original deposit is forfeited; a fresh $50 secures the new slot.
-      // The customer consented in the confirm step before reaching here.
-      const collected = await collectDeposit(booking, env);
+      // The customer consented (and entered a card) in the confirm step.
+      if (squareConfigured(env) && !body.payment_token) {
+        return json({ ok: false, error: "deposit_required" }, 402);
+      }
+      const collected = await collectDeposit(booking, env, body.payment_token);
       if (!collected.ok) {
-        return json({ ok: false, error: "We couldn't process the deposit. Please try again." }, 402);
+        return json({ ok: false, error: "Your card couldn't be charged. Please check the details and try again." }, 402);
       }
       await forfeitDeposit(booking, env);
       event = { event: "reschedule_late", from, to, by: "customer", notice_hours: notice, deposit: "forfeited_new_required", at };
       emailBuilder = emailRescheduleLate;
 
       const swapped = await atomicSwap(env, booking.id, newDate, newStart, newEnd, event,
-        { incrementCount: true, depositStatus: "held" });
-      if (!swapped) return json({ ok: false, error: "slot_taken" }, 409);
+        { incrementCount: true, depositStatus: "held", squarePaymentId: collected.square_payment_id });
+      if (!swapped) {
+        // Slot vanished between charge and swap — put the fresh deposit back.
+        if (collected.square_payment_id) {
+          await refundDeposit({ id: booking.id, square_payment_id: collected.square_payment_id, deposit_amount_cents: booking.deposit_amount_cents }, env);
+        }
+        return json({ ok: false, error: "slot_taken" }, 409);
+      }
     } else {
       event = { event: "reschedule", from, to, by: "customer", notice_hours: notice, deposit: "carried", at };
       emailBuilder = emailRescheduleOnTime;

@@ -307,6 +307,24 @@
     </div>
   </div>
 
+  <!-- ── Deposit step (within-24h reschedule) ────────────────────────────── -->
+  <div class="view" id="viewDeposit">
+    <h1>Secure the new time</h1>
+    <p class="intro">A $50 deposit secures your new appointment and will be applied to your service.</p>
+    <div class="card">
+      <label class="field-label">Card</label>
+      <div id="mCardContainer" style="margin-bottom:6px"></div>
+      <p style="font-size:12px;color:var(--muted2);line-height:1.6;margin-bottom:14px">
+        Card details go directly to Square — we never see or store them.
+      </p>
+      <div class="btn-row">
+        <button class="btn btn-gold" id="depositPayBtn">Pay $50 &amp; confirm</button>
+        <button class="btn btn-ghost" id="depositBackBtn">Back</button>
+      </div>
+      <div class="msg" id="depositMsg"></div>
+    </div>
+  </div>
+
   <!-- ── Cancel confirm (§3.6) ───────────────────────────────────────────── -->
   <div class="view" id="viewConfirmCancel">
     <h1>Cancel this appointment?</h1>
@@ -605,15 +623,97 @@ $("pickContinue").addEventListener("click", () => {
 });
 $("reschedBackBtn").addEventListener("click", () => show("viewPicker"));
 
+// ── Square deposit for within-24h reschedules ─────────────────────────────
+// The card is tokenized by Square in the browser; numbers never touch our server.
+let mCard = null;
+let mPaymentsChecked = false;
+let mPaymentsEnabled = false;
+
+async function ensurePaymentsReady() {
+  if (mPaymentsChecked) return mPaymentsEnabled;
+  mPaymentsChecked = true;
+  try {
+    const cfg = await (await fetch("/api/payments-config")).json();
+    if (!cfg.ok || !cfg.enabled) return (mPaymentsEnabled = false);
+    const sdkUrl = cfg.environment === "production"
+      ? "https://web.squarecdn.com/v1/square.js"
+      : "https://sandbox.web.squarecdn.com/v1/square.js";
+    await new Promise((res, rej) => {
+      const s = document.createElement("script");
+      s.src = sdkUrl; s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+    const payments = window.Square.payments(cfg.application_id, cfg.location_id);
+    mCard = await payments.card({
+      style: {
+        "input": { backgroundColor: "#141418", color: "#ece9e2", fontSize: "15px" },
+        ".input-container": { borderColor: "rgba(255,255,255,.14)", borderRadius: "12px" },
+        ".input-container.is-focus": { borderColor: "rgba(199,167,106,.55)" },
+        ".input-container.is-error": { borderColor: "#f87171" },
+        ".message-text": { color: "rgba(255,255,255,.55)" },
+        ".message-text.is-error": { color: "#f87171" },
+      },
+    });
+    await mCard.attach("#mCardContainer");
+    return (mPaymentsEnabled = true);
+  } catch (e) {
+    console.error("Square init failed:", e);
+    return (mPaymentsEnabled = false);
+  }
+}
+
+$("depositBackBtn").addEventListener("click", () => show("viewConfirmResched"));
+
+$("depositPayBtn").addEventListener("click", async () => {
+  const btn = $("depositPayBtn");
+  const msg = $("depositMsg");
+  btn.disabled = true;
+  msg.className = "msg ok"; msg.textContent = "One moment…";
+  try {
+    const result = await mCard.tokenize();
+    if (result.status !== "OK") {
+      msg.className = "msg err";
+      msg.textContent = result.errors?.[0]?.message || "Please check your card details.";
+      btn.disabled = false;
+      return;
+    }
+    await doReschedule(result.token, btn, msg);
+  } catch (e) {
+    msg.className = "msg err"; msg.textContent = GENERIC_ERR;
+    btn.disabled = false;
+  }
+});
+
 $("reschedConfirmBtn").addEventListener("click", async () => {
   const btn = $("reschedConfirmBtn");
   const msg = $("reschedMsg");
   btn.disabled = true;
+
+  // Within 24h with live payments → collect the fresh deposit first
+  if (booking.within_cutoff) {
+    msg.className = "msg ok"; msg.textContent = "One moment…";
+    const ready = await ensurePaymentsReady();
+    btn.disabled = false;
+    msg.textContent = "";
+    if (ready) {
+      $("depositMsg").textContent = "";
+      $("depositPayBtn").disabled = false;
+      show("viewDeposit");
+      return;
+    }
+    // Payments not live (e.g. sandbox off) — proceed; server stubs the deposit
+    btn.disabled = true;
+  }
+
+  await doReschedule(null, btn, msg);
+});
+
+async function doReschedule(paymentToken, btn, msg) {
   msg.className = "msg ok"; msg.textContent = "One moment…";
   try {
     const res  = await fetch("/api/manage/reschedule", {
       method: "POST", headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token, date: picked.date, start_hour: picked.start_hour }),
+      body: JSON.stringify({ token, date: picked.date, start_hour: picked.start_hour, payment_token: paymentToken }),
     });
     const data = await res.json();
     if (data.ok) {
@@ -644,7 +744,7 @@ $("reschedConfirmBtn").addEventListener("click", async () => {
     msg.className = "msg err"; msg.textContent = GENERIC_ERR;
     btn.disabled = false;
   }
-});
+}
 
 // ── Cancel flow ───────────────────────────────────────────────────────────
 $("cancelBtn").addEventListener("click", () => {

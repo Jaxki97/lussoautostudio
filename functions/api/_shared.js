@@ -205,15 +205,16 @@ export async function validateTargetSlot(env, date, start_hour, duration_hours) 
 // free of other active bookings. Appends the event and (optionally) increments
 // reschedule_count in the same statement, so there is no double-book window.
 // Returns true if the swap happened, false if the slot was taken mid-flow.
-export async function atomicSwap(env, bookingId, newDate, newStart, newEnd, event, { incrementCount = false, depositStatus = null } = {}) {
+export async function atomicSwap(env, bookingId, newDate, newStart, newEnd, event, { incrementCount = false, depositStatus = null, squarePaymentId = undefined } = {}) {
   const sets = [
     "date = ?1", "start_hour = ?2", "end_hour = ?3",
     "event_log = json_insert(event_log, '$[#]', json(?5))",
   ];
   if (incrementCount) sets.push("reschedule_count = reschedule_count + 1");
   if (depositStatus)  sets.push(`deposit_status = '${depositStatus}'`); // internal enum, not user input
+  if (squarePaymentId !== undefined) sets.push("square_payment_id = ?6");
 
-  const res = await env.DB.prepare(
+  let stmt = env.DB.prepare(
     `UPDATE bookings SET ${sets.join(", ")}
       WHERE id = ?4 AND status = 'active'
         AND NOT EXISTS (
@@ -221,7 +222,11 @@ export async function atomicSwap(env, bookingId, newDate, newStart, newEnd, even
            WHERE b2.id != ?4 AND b2.date = ?1 AND b2.status = 'active'
              AND NOT (b2.end_hour <= ?2 OR b2.start_hour >= ?3)
         )`
-  ).bind(newDate, newStart, newEnd, bookingId, JSON.stringify(event)).run();
+  );
+  stmt = squarePaymentId !== undefined
+    ? stmt.bind(newDate, newStart, newEnd, bookingId, JSON.stringify(event), squarePaymentId)
+    : stmt.bind(newDate, newStart, newEnd, bookingId, JSON.stringify(event));
+  const res = await stmt.run();
 
   return (res.meta?.changes ?? 0) > 0;
 }
@@ -232,21 +237,59 @@ export async function appendEvent(env, bookingId, event) {
   ).bind(JSON.stringify(event), bookingId).run();
 }
 
-// ── Square integration points (§11) — stub-friendly ─────────────────────────
+// ── Square integration (§11) ─────────────────────────────────────────────────
+// Card data never touches this server: the browser tokenizes via Square's
+// Web Payments SDK and we only ever handle the one-time source_id token and
+// the resulting payment id. Falls back to logged no-op stubs when creds are
+// absent (e.g. production before go-live), so the state machine keeps working.
 
-function squareConfigured(env) {
+export function squareConfigured(env) {
   return Boolean(env.SQUARE_ACCESS_TOKEN && env.SQUARE_LOCATION_ID);
 }
 
-// Charges $50 CAD; returns { ok, square_payment_id }. Stubbed until creds land.
-export async function collectDeposit(booking, env) {
+function squareBase(env) {
+  return env.SQUARE_ENVIRONMENT === "production"
+    ? "https://connect.squareup.com"
+    : "https://connect.squareupsandbox.com";
+}
+
+async function squareRequest(env, path, body) {
+  const res = await fetch(`${squareBase(env)}${path}`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${env.SQUARE_ACCESS_TOKEN}`,
+      "Square-Version": "2025-05-21",
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    console.error(`[square] ${path} failed:`, JSON.stringify(data.errors ?? data).slice(0, 500));
+    return { ok: false, errors: data.errors };
+  }
+  return { ok: true, data };
+}
+
+// Charges the deposit against a one-time card token from the browser.
+// Returns { ok, square_payment_id }.
+export async function collectDeposit(booking, env, sourceId) {
   if (!squareConfigured(env)) {
     console.log(`[square:stub] collectDeposit ${booking.id} $${(booking.deposit_amount_cents ?? 5000) / 100}`);
     return { ok: true, square_payment_id: null };
   }
-  // TODO(square): create payment via Square Payments API using stored card/checkout.
-  console.log(`[square] collectDeposit not yet implemented — treating as success`);
-  return { ok: true, square_payment_id: null };
+  if (!sourceId) return { ok: false };
+
+  const r = await squareRequest(env, "/v2/payments", {
+    source_id: sourceId,
+    idempotency_key: crypto.randomUUID(),
+    amount_money: { amount: booking.deposit_amount_cents ?? 5000, currency: "CAD" },
+    location_id: env.SQUARE_LOCATION_ID,
+    note: `Lusso deposit ${booking.ref ?? booking.id}`,
+    autocomplete: true,
+  });
+  if (!r.ok) return { ok: false };
+  return { ok: true, square_payment_id: r.data.payment?.id ?? null };
 }
 
 export async function refundDeposit(booking, env) {
@@ -254,14 +297,18 @@ export async function refundDeposit(booking, env) {
     console.log(`[square:stub] refundDeposit ${booking.id}`);
     return { ok: true };
   }
-  // TODO(square): POST /v2/refunds for booking.square_payment_id.
-  console.log(`[square] refundDeposit not yet implemented — treating as success`);
-  return { ok: true };
+  const r = await squareRequest(env, "/v2/refunds", {
+    idempotency_key: crypto.randomUUID(),
+    payment_id: booking.square_payment_id,
+    amount_money: { amount: booking.deposit_amount_cents ?? 5000, currency: "CAD" },
+    reason: `Lusso deposit refund ${booking.ref ?? booking.id}`,
+  });
+  return { ok: r.ok };
 }
 
 // No API call — Square keeps the captured funds; state change only.
 export async function forfeitDeposit(booking, env) {
-  console.log(`[square:stub] forfeitDeposit ${booking.id}`);
+  console.log(`[square] forfeitDeposit ${booking.id} — funds retained, state change only`);
   return { ok: true };
 }
 

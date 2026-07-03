@@ -1290,6 +1290,16 @@
                 <div class="estimate-note">Final price confirmed on arrival — may vary with vehicle condition.</div>
               </div>
 
+              <div id="depositSection" style="display:none">
+                <label>Deposit — $50</label>
+                <div id="cardContainer" style="margin-top:6px"></div>
+                <div class="helper" style="margin-top:8px; line-height:1.6">
+                  A $50 deposit holds your appointment and is applied to your service.
+                  Free to change or cancel up to 24 hours before. Within 24 hours, the deposit holds the reserved time.
+                  Card details go directly to Square — we never see or store them.
+                </div>
+              </div>
+
               <div class="submit-row">
                 <a class="btn btn-gold" href="javascript:void(0)" id="bk_submitBtn" role="button" aria-label="Confirm appointment">
                   Confirm Appointment →
@@ -1709,6 +1719,49 @@
         setStatus("Live availability • updated");
       }
 
+      // ── Square deposit (card is tokenized by Square in the browser; card
+      //    numbers never touch our server) ──────────────────────────────────────
+      let sqCard = null;          // Square card element, when payments are live
+      let sqEnabled = false;
+
+      async function initPayments(){
+        try{
+          const res  = await fetch("/api/payments-config");
+          const cfg  = await res.json();
+          if(!cfg.ok || !cfg.enabled) return;   // deposits not live → book without card
+
+          const sdkUrl = cfg.environment === "production"
+            ? "https://web.squarecdn.com/v1/square.js"
+            : "https://sandbox.web.squarecdn.com/v1/square.js";
+          await new Promise((resolve, reject) => {
+            const s = document.createElement("script");
+            s.src = sdkUrl; s.onload = resolve; s.onerror = reject;
+            document.head.appendChild(s);
+          });
+
+          const payments = window.Square.payments(cfg.application_id, cfg.location_id);
+          sqCard = await payments.card({
+            style: {
+              "input": { backgroundColor: "#141418", color: "#ece9e2", fontSize: "15px" },
+              "input.is-focus": { color: "#ece9e2" },
+              ".input-container": { borderColor: "rgba(255,255,255,.14)", borderRadius: "12px" },
+              ".input-container.is-focus": { borderColor: "rgba(199,167,106,.55)" },
+              ".input-container.is-error": { borderColor: "#f87171" },
+              ".message-text": { color: "rgba(255,255,255,.55)" },
+              ".message-text.is-error": { color: "#f87171" },
+            },
+          });
+          await sqCard.attach("#cardContainer");
+          sqEnabled = true;
+          document.getElementById("depositSection").style.display = "block";
+        } catch(e){
+          // If Square fails to load we leave the form card-less; the backend
+          // will still refuse chargeless bookings when payments are enabled.
+          console.error("Square init failed:", e);
+        }
+      }
+      initPayments();
+
       // ── Submit booking ───────────────────────────────────────────────────────
       async function bookNow(){
         const name     = document.getElementById("bk_name").value.trim();
@@ -1743,6 +1796,27 @@
         const duration = SERVICE_DURATIONS[service] || 2;
 
         setLoading(true);
+
+        // Tokenize the deposit card first (when deposits are live)
+        let payment_token = null;
+        if(sqEnabled && sqCard){
+          setStatus("Securing your $50 deposit…");
+          try{
+            const result = await sqCard.tokenize();
+            if(result.status !== "OK"){
+              const msg = result.errors?.[0]?.message || "Please check your card details.";
+              setStatus(`Card issue: ${msg}`);
+              setLoading(false);
+              return;
+            }
+            payment_token = result.token;
+          } catch(e){
+            setStatus("Card issue: please check your card details and try again.");
+            setLoading(false);
+            return;
+          }
+        }
+
         setStatus("Placing your booking…");
 
         let res, out;
@@ -1760,7 +1834,8 @@
               email,
               vehicle,
               city,
-              notes
+              notes,
+              payment_token
             })
           });
           out = await res.json().catch(() => ({}));
