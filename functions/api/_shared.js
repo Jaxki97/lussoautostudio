@@ -107,10 +107,13 @@ export function generateToken() {
   return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
-// One active token per booking, valid until the appointment start passes
-// (+2h grace). Reuses an existing live token; extends expiry on reschedule.
+// One active token per booking. Links are capped at 24h from issue (owner's
+// choice) — the email-OTP door is the main return path after that. Each new
+// email refreshes the 24h window; a link never outlives the appointment
+// (+2h grace).
 export async function getOrCreateManageToken(env, booking) {
-  const expiresAt = new Date(appointmentUtcMs(booking.date, booking.start_hour) + 2 * 3_600_000).toISOString();
+  const apptCapMs = appointmentUtcMs(booking.date, booking.start_hour) + 2 * 3_600_000;
+  const expiresAt = new Date(Math.min(Date.now() + 24 * 3_600_000, apptCapMs)).toISOString();
   const now = new Date().toISOString();
 
   const existing = await env.DB.prepare(
