@@ -64,7 +64,7 @@ async function sendBookingEmail(booking, env) {
   const timeLabel = `${formatHour(booking.start_hour)} – ${formatHour(booking.end_hour)}`;
 
   const html = `
-    <div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;background:#09090b;color:#ece9e2;border-radius:16px;overflow:hidden;border:1px solid rgba(199,167,106,.20)">
+    <div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;background:#091513;color:#ece9e2;border-radius:16px;overflow:hidden;border:1px solid rgba(199,167,106,.20)">
       <div style="background:linear-gradient(135deg,rgba(199,167,106,.15),rgba(199,167,106,.05));padding:24px 28px;border-bottom:1px solid rgba(199,167,106,.15)">
         <p style="margin:0;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#a8894e">Lusso Auto Studio</p>
         <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;color:#c7a76a">New Booking Confirmed</h1>
@@ -78,6 +78,7 @@ async function sendBookingEmail(booking, env) {
           <tr><td style="padding:8px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Phone</td><td style="padding:8px 0;font-size:14px"><a href="tel:${booking.phone}" style="color:#c7a76a">${booking.phone}</a></td></tr>
           <tr><td style="padding:8px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Vehicle</td><td style="padding:8px 0;font-size:14px">${booking.vehicle}</td></tr>
           <tr><td style="padding:8px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">City</td><td style="padding:8px 0;font-size:14px">${booking.city || "—"}</td></tr>
+          <tr><td style="padding:8px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Address</td><td style="padding:8px 0;font-size:14px;font-weight:600;color:#c7a76a">${booking.address || "—"}</td></tr>
           ${booking.notes ? `<tr style="border-top:1px solid rgba(255,255,255,.07)"><td style="padding:12px 0 8px;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Notes</td><td style="padding:12px 0 8px;font-size:13px;color:rgba(255,255,255,.65)">${booking.notes}</td></tr>` : ""}
         </table>
       </div>
@@ -116,7 +117,7 @@ async function sendCustomerConfirmation(booking, env) {
   const timeLabel = `${formatHour(booking.start_hour)} – ${formatHour(booking.end_hour)}`;
 
   const html = `
-    <div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;background:#09090b;color:#ece9e2;border-radius:16px;overflow:hidden;border:1px solid rgba(199,167,106,.20)">
+    <div style="font-family:system-ui,sans-serif;max-width:520px;margin:0 auto;background:#091513;color:#ece9e2;border-radius:16px;overflow:hidden;border:1px solid rgba(199,167,106,.20)">
       <div style="background:linear-gradient(135deg,rgba(199,167,106,.15),rgba(199,167,106,.05));padding:24px 28px;border-bottom:1px solid rgba(199,167,106,.15)">
         <p style="margin:0;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#a8894e">Lusso Auto Studio</p>
         <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;color:#c7a76a">Your Appointment is Confirmed</h1>
@@ -178,6 +179,7 @@ export async function onRequestPost({ request, env }) {
   const email          = sanitize(body.email);
   const vehicle        = sanitize(body.vehicle);
   const city           = sanitize(body.city);
+  const address        = sanitize(body.address);
   const notes          = sanitize(body.notes);
   const start_hour     = Number(body.start_hour);
   const duration_hours = Number(body.duration_hours);
@@ -202,6 +204,7 @@ export async function onRequestPost({ request, env }) {
     return json({ ok: false, error: "A valid email address is required" }, 400);
   }
   if (!vehicle) return json({ ok: false, error: "Vehicle is required" }, 400);
+  if (!address) return json({ ok: false, error: "Service address is required" }, 400);
 
   // ── Date rules ──────────────────────────────────────────────────────────────
   const d = new Date(`${date}T00:00:00Z`);
@@ -295,15 +298,15 @@ export async function onRequestPost({ request, env }) {
       const res = await env.DB.prepare(
         `INSERT INTO bookings
            (id, date, start_hour, duration_hours, end_hour,
-            service, name, phone, email, vehicle, city, notes, status, created_at, ref,
+            service, name, phone, email, vehicle, city, address, notes, status, created_at, ref,
             deposit_status, square_payment_id)
-         SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, 'active', ?13, ?14, ?15, ?16
+         SELECT ?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?17, ?12, 'active', ?13, ?14, ?15, ?16
           WHERE NOT EXISTS (
             SELECT 1 FROM bookings
              WHERE date = ?2 AND status = 'active'
                AND NOT (end_hour <= ?3 OR start_hour >= ?5)
           )`
-      ).bind(id, date, start_hour, duration_hours, end_hour, service, name, phone, email, vehicle, city, notes, created_at, ref, deposit_status, square_payment_id).run();
+      ).bind(id, date, start_hour, duration_hours, end_hour, service, name, phone, email, vehicle, city, notes, created_at, ref, deposit_status, square_payment_id, address).run();
       if ((res.meta?.changes ?? 0) === 0) {
         return bail(409, "That time slot is no longer available. Please choose another time.");
       }
@@ -330,7 +333,7 @@ export async function onRequestPost({ request, env }) {
   }
 
   // ── Send notification emails (non-blocking) ─────────────────────────────────
-  await sendBookingEmail({ id, ref, date, start_hour, end_hour, service, name, phone, email, vehicle, city, notes }, env);
+  await sendBookingEmail({ id, ref, date, start_hour, end_hour, service, name, phone, email, vehicle, city, address, notes }, env);
   await sendCustomerConfirmation({ id, ref, date, start_hour, end_hour, service, name, email, vehicle, manage_link: mLink }, env);
 
   return json({ ok: true, id, ref, date, start_hour, end_hour, service }, 201);

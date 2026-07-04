@@ -6,7 +6,7 @@
   <link rel="canonical" href="https://lussoautostudio.ca/">
   <title>Lusso Auto Studio | Private Mobile Auto Detailing in KWC</title>
   <meta name="description" content="Luxury-level, appointment-only mobile auto detailing in Kitchener–Waterloo–Cambridge. Membership available by request." />
-  <meta name="theme-color" content="#0b0b0c" />
+  <meta name="theme-color" content="#091513" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -40,8 +40,8 @@
 
   <style>
     :root{
-      --bg:#0b0b0c;
-      --bg2:#111216;
+      --bg:#091513;
+      --bg2:#0e1c19;
       --card:rgba(255,255,255,.06);
       --line:rgba(255,255,255,.08);
       --line2:rgba(199,167,106,.22);
@@ -93,8 +93,9 @@
     header{
       position:sticky; top:0; z-index:50;
       border-bottom:1px solid rgba(255,255,255,.06);
-      background:rgba(11,11,12,.72);
-      backdrop-filter: blur(10px);
+      background:rgba(9,21,19,.55);
+      backdrop-filter: blur(16px) saturate(150%);
+      -webkit-backdrop-filter: blur(16px) saturate(150%);
     }
 
     .wrap{max-width:var(--max); margin:0 auto; padding:0 16px}
@@ -222,8 +223,10 @@
 
     .card{
       border-radius:var(--radius);
-      background:var(--bg2);
-      box-shadow:0 0 0 1px var(--line2) inset, var(--shadow);
+      background:rgba(255,255,255,.075);
+      backdrop-filter:blur(22px) saturate(160%);
+      -webkit-backdrop-filter:blur(22px) saturate(160%);
+      box-shadow:inset 0 1px 0 0 rgba(255,255,255,.22), 0 0 0 1px var(--line2) inset, 0 12px 40px rgba(0,0,0,.34);
       overflow:hidden;
     }
     .card img{
@@ -277,8 +280,10 @@
 
     .mini{
       border-radius:var(--radius);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      box-shadow:0 0 0 1px rgba(255,255,255,.07) inset;
+      background:rgba(255,255,255,.075);
+      backdrop-filter:blur(20px) saturate(160%);
+      -webkit-backdrop-filter:blur(20px) saturate(160%);
+      box-shadow:inset 0 1px 0 0 rgba(255,255,255,.22), inset 0 0 0 1px rgba(255,255,255,.13), 0 10px 30px rgba(0,0,0,.30);
       padding:18px;
       transition:transform .16s ease, background .2s ease, box-shadow .2s ease;
       position:relative;
@@ -326,8 +331,12 @@
 
     .lux{
       border-radius:var(--radius);
-      background:var(--bg2);
-      box-shadow:0 0 0 1px var(--line2) inset, var(--shadow);
+      background:
+        radial-gradient(900px circle at 10% 0%, rgba(199,167,106,.14), rgba(17,18,22,0) 55%),
+        rgba(255,255,255,.07);
+      backdrop-filter:blur(26px) saturate(160%);
+      -webkit-backdrop-filter:blur(26px) saturate(160%);
+      box-shadow:inset 0 1px 0 0 rgba(255,255,255,.24), 0 0 0 1px var(--line2) inset, var(--shadow), 0 12px 40px rgba(0,0,0,.34);
       padding:18px;
     }
     .lux .top{display:flex; align-items:flex-end; justify-content:space-between; gap:12px;}
@@ -376,7 +385,7 @@
       border-radius:18px;
       padding:12px 12px;
       border:1px solid rgba(255,255,255,.10);
-      background:#0f1013;
+      background:#0e1c19;
       color:var(--text);
       outline:none;
       transition:border-color .2s ease, box-shadow .2s ease;
@@ -454,8 +463,10 @@
     .estimate-box{
       border-radius:18px;
       padding:14px 16px;
-      background:linear-gradient(180deg, rgba(199,167,106,.08), rgba(199,167,106,.04));
-      box-shadow:0 0 0 1px rgba(199,167,106,.20) inset;
+      background:linear-gradient(180deg, rgba(199,167,106,.12), rgba(199,167,106,.06));
+      backdrop-filter:blur(18px) saturate(160%);
+      -webkit-backdrop-filter:blur(18px) saturate(160%);
+      box-shadow:inset 0 1px 0 0 rgba(255,255,255,.20), 0 0 0 1px rgba(199,167,106,.26) inset;
       display:none;
       flex-direction:column;
       gap:8px;
@@ -476,17 +487,21 @@
 
     .panel{
       border-radius:var(--radius);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      box-shadow:0 0 0 1px rgba(255,255,255,.06) inset;
+      background:rgba(255,255,255,.075);
+      backdrop-filter:blur(24px) saturate(160%);
+      -webkit-backdrop-filter:blur(24px) saturate(160%);
+      box-shadow:inset 0 1px 0 0 rgba(255,255,255,.22), inset 0 0 0 1px rgba(255,255,255,.12), 0 12px 40px rgba(0,0,0,.32);
       padding:18px;
     }
 
     .panel-premium{
       border-radius:var(--radius);
       background:
-        radial-gradient(900px circle at 10% 0%, rgba(199,167,106,.10), rgba(17,18,22,0) 55%),
-        linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
-      box-shadow:0 0 0 1px rgba(199,167,106,.18) inset, var(--shadow);
+        radial-gradient(900px circle at 10% 0%, rgba(199,167,106,.14), rgba(17,18,22,0) 55%),
+        rgba(255,255,255,.07);
+      backdrop-filter:blur(26px) saturate(160%);
+      -webkit-backdrop-filter:blur(26px) saturate(160%);
+      box-shadow:inset 0 1px 0 0 rgba(255,255,255,.24), 0 0 0 1px rgba(199,167,106,.24) inset, var(--shadow), 0 12px 40px rgba(0,0,0,.34);
       padding:18px;
       position:relative;
       overflow:hidden;
@@ -687,10 +702,9 @@
 
         <nav aria-label="Primary">
           <a href="#services">Services</a>
-          <a href="#membership">Membership</a>
           <a href="#results">What to Expect</a>
           <a href="#book">Book</a>
-          <a class="btn btn-gold btn-sm" href="#apply">Request Access →</a>
+          <a class="btn btn-gold btn-sm" href="/membership">Membership</a>
         </nav>
       </div>
     </div>
@@ -768,7 +782,7 @@
             <div class="price-row"><span>Starting from</span><b>$150+</b></div>
           </a>
 
-          <a class="mini mini-link" href="#book" style="background:var(--bg2); box-shadow:0 0 0 1px var(--line2) inset, var(--shadow);">
+          <a class="mini mini-link" href="#book" style="background:rgba(255,255,255,.075); box-shadow:inset 0 1px 0 0 rgba(255,255,255,.22), 0 0 0 1px var(--line2) inset, 0 12px 40px rgba(0,0,0,.34);">
             <h3>Full Detail</h3>
             <p>Interior deep clean + safe exterior wash, wheels/tires, refined sealant finish.</p>
             <div class="price-row"><span>Starting from</span><b>$230+</b></div>
@@ -816,7 +830,7 @@
             </small>
 
             <div class="card-actions" style="margin-top:14px">
-              <a class="btn btn-gold" href="#apply">Request Membership Access</a>
+              <a class="btn btn-gold" href="/membership">Request Membership Access</a>
               <a class="btn btn-ghost" href="#book">Start with One-Time Detail</a>
             </div>
           </div>
@@ -1221,8 +1235,27 @@
                 </div>
                 <div>
                   <label for="bk_city">City</label>
-                  <input id="bk_city" placeholder="Cambridge / Waterloo / Kitchener" required />
+                  <select id="bk_city" required>
+                    <option value="" disabled selected>Select</option>
+                    <option value="Kitchener">Kitchener</option>
+                    <option value="Waterloo">Waterloo</option>
+                    <option value="Cambridge">Cambridge</option>
+                    <option value="Other">Other…</option>
+                  </select>
                 </div>
+              </div>
+
+              <div id="bk_otherCityWrap" style="display:none">
+                <label for="bk_city_other">Which city?</label>
+                <input id="bk_city_other" placeholder="Tell us where you're located" />
+                <div class="helper" style="margin-top:8px; line-height:1.6">
+                  We're focused on Kitchener, Waterloo and Cambridge right now. Leave your city and we'll be in touch about serving your area.
+                </div>
+              </div>
+
+              <div>
+                <label for="bk_address">Service address <span style="color:var(--muted2);font-size:11px;letter-spacing:.1em">(where we'll detail your vehicle)</span></label>
+                <input id="bk_address" placeholder="Street address, unit #" required />
               </div>
 
               <div class="two">
@@ -1321,88 +1354,15 @@
           </div>
 
           <!-- Right: Membership application -->
-          <div id="apply" class="panel" style="box-shadow:0 0 0 1px var(--line2) inset, var(--shadow); background:var(--bg2);">
-            <div class="form-top">
-              <div>
-                <div class="eyebrow">Request access</div>
-                <h3 style="font-family:'Cormorant Garamond',serif; font-size:26px; letter-spacing:.01em;">
-                  Membership application
-                </h3>
-                <p class="form-note">
-                  Share a few details — we'll confirm fit and availability within 24 hours.
-                </p>
-              </div>
-
-              <div class="avail-pill" title="Membership clients are scheduled first">
-                <span class="avail-dot"></span>
-                <span><b>Priority:</b> Members first</span>
-              </div>
+          <div class="panel" style="box-shadow:inset 0 1px 0 0 rgba(255,255,255,.22), 0 0 0 1px var(--line2) inset, 0 12px 40px rgba(0,0,0,.34); background:rgba(255,255,255,.075); display:flex; flex-direction:column; justify-content:center;">
+            <div class="eyebrow">By membership</div>
+            <h3 style="font-family:'Cormorant Garamond',serif; font-size:28px; letter-spacing:.01em; margin-top:8px;">Membership</h3>
+            <p class="form-note" style="margin-top:12px;">
+              Effortless, recurring care for those who'd rather never think about it — your vehicle kept quietly immaculate on a standing schedule, members served first.
+            </p>
+            <div class="submit-row" style="margin-top:20px;">
+              <a class="btn btn-gold" href="/membership">Explore Membership →</a>
             </div>
-
-            <form id="membershipForm" action="#" method="POST">
-              <div class="two">
-                <div>
-                  <label for="name">Name</label>
-                  <input id="name" name="name" placeholder="Your name" required />
-                </div>
-                <div>
-                  <label for="phone">Phone</label>
-                  <input id="phone" name="phone" placeholder="(xxx) xxx-xxxx" required />
-                </div>
-              </div>
-
-              <div class="two">
-                <div>
-                  <label for="vehicle">Vehicle</label>
-                  <input id="vehicle" name="vehicle" placeholder="e.g., Tesla Model Y" required />
-                </div>
-                <div>
-                  <label for="city">City</label>
-                  <input id="city" name="city" placeholder="Cambridge / Waterloo / Kitchener" required />
-                </div>
-              </div>
-
-              <div class="two">
-                <div>
-                  <label for="parking">Parking access</label>
-                  <select id="parking" name="parking" required>
-                    <option value="" disabled selected>Select</option>
-                    <option>Private driveway</option>
-                    <option>Private garage</option>
-                    <option>Condo / underground</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label for="start">Preferred start</label>
-                  <select id="start" name="start" required>
-                    <option value="" disabled selected>Select</option>
-                    <option>Within 7 days</option>
-                    <option>2–3 weeks</option>
-                    <option>Next month</option>
-                  </select>
-                </div>
-              </div>
-
-              <div>
-                <label for="msg">Anything we should know?</label>
-                <textarea id="msg" name="message" placeholder="Two vehicles? preferred days? recurring needs?"></textarea>
-              </div>
-
-              <div class="submit-row">
-                <a class="btn btn-gold" href="javascript:void(0)" id="submitBtn" role="button" aria-label="Submit membership request">
-                  Submit Request →
-                </a>
-                <div class="helper">We'll text you to confirm next steps.</div>
-              </div>
-
-              <p style="margin:12px 0 0; color:var(--muted2); font-size:12px; line-height:1.5;">
-                By submitting, you agree to be contacted for scheduling and quoting. Appointment-only. Limited roster.
-              </p>
-
-              <button type="submit" id="realSubmit" style="display:none">Submit</button>
-            </form>
           </div>
         </div>
       </div>
@@ -1430,7 +1390,7 @@
     <div class="bar" aria-label="Mobile quick actions">
       <a href="#services">Services</a>
       <a href="#book">Book</a>
-      <a href="#apply">Apply</a>
+      <a href="/membership">Membership</a>
     </div>
   </main>
 
@@ -1478,76 +1438,6 @@
       }, {passive:true});
     })();
 
-    // ── Membership form submit ────────────────────────────────────────────────
-    (function(){
-      const submitBtn  = document.getElementById("submitBtn");
-      const statusDiv  = document.createElement("div");
-      statusDiv.style.cssText = "margin-top:10px;font-size:13px;color:rgba(255,255,255,.7);min-height:18px;";
-      submitBtn.parentElement.insertAdjacentElement("afterend", statusDiv);
-
-      function setStatus(msg, color) {
-        statusDiv.textContent = msg;
-        statusDiv.style.color = color || "rgba(255,255,255,.7)";
-      }
-      function setLoading(on) {
-        submitBtn.style.opacity       = on ? ".6"    : "1";
-        submitBtn.style.pointerEvents = on ? "none"  : "auto";
-        submitBtn.textContent         = on ? "Submitting…" : "Submit Request →";
-      }
-
-      submitBtn.addEventListener("click", async function() {
-        const name    = document.getElementById("name").value.trim();
-        const phone   = document.getElementById("phone").value.trim();
-        const vehicle = document.getElementById("vehicle").value.trim();
-        const city    = document.getElementById("city").value.trim();
-        const parking = document.getElementById("parking").value;
-        const start   = document.getElementById("start").value;
-        const message = document.getElementById("msg").value.trim();
-
-        if (!name || !phone || !vehicle || !city || !parking || !start) {
-          setStatus("Please fill in all required fields.", "#f87171");
-          return;
-        }
-
-        setLoading(true);
-        setStatus("Sending your application…");
-
-        let res, data;
-        try {
-          res  = await fetch("/api/membership/apply", {
-            method:  "POST",
-            headers: { "Content-Type": "application/json" },
-            body:    JSON.stringify({
-              name, phone, vehicle, city,
-              parking, preferred_start: start, message
-            }),
-          });
-          data = await res.json();
-        } catch(e) {
-          setLoading(false);
-          setStatus("Network error — please try again.", "#f87171");
-          return;
-        }
-
-        setLoading(false);
-
-        if (res.ok && data && data.ok) {
-          document.getElementById("membershipForm").style.display = "none";
-          const thanks = document.createElement("div");
-          thanks.style.cssText = "padding:28px 0;text-align:center;";
-          thanks.innerHTML = [
-            "<div style=\"font-size:32px;margin-bottom:14px\">✓</div>",
-            "<div style=\"font-family:\'Cormorant Garamond\',serif;font-size:22px;margin-bottom:10px;color:#c7a76a\">Application Received</div>",
-            "<div style=\"color:rgba(255,255,255,.65);line-height:1.7;font-size:14px;max-width:340px;margin:0 auto\">",
-            "Thank you for your interest — we will get back to you with a decision as soon as possible.",
-            "</div>"
-          ].join("");
-          document.getElementById("membershipForm").insertAdjacentElement("afterend", thanks);
-        } else {
-          setStatus((data && data.error) || "Something went wrong. Please try again.", "#f87171");
-        }
-      });
-    })();
 
     // =========================================================================
     // BOOKING WIDGET
@@ -1769,7 +1659,11 @@
         const name     = document.getElementById("bk_name").value.trim();
         const phone    = document.getElementById("bk_phone").value.trim();
         const email    = document.getElementById("bk_email").value.trim();
-        const city     = document.getElementById("bk_city").value.trim();
+        const citySel  = document.getElementById("bk_city").value.trim();
+        const city     = citySel === "Other"
+          ? document.getElementById("bk_city_other").value.trim()
+          : citySel;
+        const address  = document.getElementById("bk_address").value.trim();
         const service  = serviceEl.value;
         const date     = dateEl.value;
         const { name: vehicle, size } = parseVehicle(vehicleEl.value);
@@ -1786,7 +1680,7 @@
         ].filter(Boolean);
         const notes = notesParts.join(" | ");
 
-        if(!name || !phone || !email || !vehicle || !city || !service || !date){
+        if(!name || !phone || !email || !vehicle || !city || !address || !service || !date){
           setStatus("Please fill in all required fields first.");
           return;
         }
@@ -1836,6 +1730,7 @@
               email,
               vehicle,
               city,
+              address,
               notes,
               payment_token
             })
@@ -1924,6 +1819,13 @@
       dateEl.addEventListener("change",   loadSlots);
       serviceEl.addEventListener("change", () => { loadSlots(); updateEstimate(); });
       submitBtn.addEventListener("click",  bookNow);
+
+      // Reveal the free-text city field only when "Other" is chosen
+      const cityEl = document.getElementById("bk_city");
+      cityEl.addEventListener("change", () => {
+        const isOther = cityEl.value === "Other";
+        document.getElementById("bk_otherCityWrap").style.display = isOther ? "block" : "none";
+      });
 
       clearSlots("Select service + date to view availability. Booked slots appear grey.");
     })();

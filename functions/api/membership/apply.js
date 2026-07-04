@@ -120,7 +120,7 @@ async function sendOwnerEmail(app, env) {
 
   const from = env.FROM_EMAIL || "onboarding@resend.dev";
   const html = `
-    <div style="font-family:system-ui,sans-serif;max-width:540px;margin:0 auto;background:#09090b;color:#ece9e2;border-radius:16px;overflow:hidden;border:1px solid rgba(199,167,106,.20)">
+    <div style="font-family:system-ui,sans-serif;max-width:540px;margin:0 auto;background:#091513;color:#ece9e2;border-radius:16px;overflow:hidden;border:1px solid rgba(199,167,106,.20)">
       <div style="background:linear-gradient(135deg,rgba(199,167,106,.15),rgba(199,167,106,.05));padding:24px 28px;border-bottom:1px solid rgba(199,167,106,.15)">
         <p style="margin:0;font-size:11px;letter-spacing:.25em;text-transform:uppercase;color:#a8894e">Lusso Auto Studio</p>
         <h1 style="margin:8px 0 0;font-size:22px;font-weight:600;color:#c7a76a">New Membership Application</h1>
