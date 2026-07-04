@@ -54,6 +54,7 @@ export async function onRequestPost({ request, env }) {
   const phone           = sanitize(body.phone, 30);
   const vehicle         = sanitize(body.vehicle, 120);
   const city            = sanitize(body.city, 100);
+  const address         = sanitize(body.address, 200);
   const parking         = sanitize(body.parking, 60);
   const preferred_start = sanitize(body.preferred_start, 60);
   const message         = sanitize(body.message, 1000);
@@ -63,6 +64,7 @@ export async function onRequestPost({ request, env }) {
   if (!phone)   return json({ ok: false, error: "Phone is required." }, 400);
   if (!vehicle) return json({ ok: false, error: "Vehicle is required." }, 400);
   if (!city)    return json({ ok: false, error: "City is required." }, 400);
+  if (!address) return json({ ok: false, error: "Address is required." }, 400);
 
   if (!/^[\d\s\(\)\+\-\.]{7,20}$/.test(phone)) {
     return json({ ok: false, error: "Invalid phone number format." }, 400);
@@ -90,10 +92,10 @@ export async function onRequestPost({ request, env }) {
     try {
       await env.DB.prepare(`
         INSERT INTO membership_applications
-          (id, name, phone, vehicle, city, parking, preferred_start,
+          (id, name, phone, vehicle, city, address, parking, preferred_start,
            message, status, event_log, created_at, ref)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)
-      `).bind(id, name, phone, vehicle, city, parking, preferred_start,
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', ?, ?, ?)
+      `).bind(id, name, phone, vehicle, city, address, parking, preferred_start,
               message, event_log, created_at, ref).run();
       inserted = true;
     } catch (e) {
@@ -108,7 +110,7 @@ export async function onRequestPost({ request, env }) {
   }
 
   // ── Notify owner via Resend ───────────────────────────────────────────────
-  await sendOwnerEmail({ id, name, phone, vehicle, city, parking,
+  await sendOwnerEmail({ id, name, phone, vehicle, city, address, parking,
                          preferred_start, message, created_at }, env);
 
   return json({ ok: true, id }, 201);
@@ -131,6 +133,7 @@ async function sendOwnerEmail(app, env) {
           <tr><td style="padding:7px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Phone</td><td style="padding:7px 0;font-size:14px"><a href="tel:${esc(app.phone)}" style="color:#c7a76a">${esc(app.phone)}</a></td></tr>
           <tr><td style="padding:7px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Vehicle</td><td style="padding:7px 0;font-size:14px">${esc(app.vehicle)}</td></tr>
           <tr><td style="padding:7px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">City</td><td style="padding:7px 0;font-size:14px">${esc(app.city)}</td></tr>
+          <tr><td style="padding:7px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Address</td><td style="padding:7px 0;font-size:14px;color:#c7a76a">${esc(app.address || "—")}</td></tr>
           <tr><td style="padding:7px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Parking</td><td style="padding:7px 0;font-size:14px">${esc(app.parking)}</td></tr>
           <tr><td style="padding:7px 0;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Start</td><td style="padding:7px 0;font-size:14px">${esc(app.preferred_start)}</td></tr>
           ${app.message ? `<tr style="border-top:1px solid rgba(255,255,255,.07)"><td style="padding:10px 0 7px;font-size:12px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.15em">Notes</td><td style="padding:10px 0 7px;font-size:13px;color:rgba(255,255,255,.65)">${esc(app.message)}</td></tr>` : ""}
